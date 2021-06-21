@@ -20,7 +20,7 @@ namespace MMO_Client.Screens.LoginScreen
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             OnLoginEvent?.Invoke(UsernameTextbox.Text, PwdPasswordbox.Password);
-            Close();
+            //Close();
         }
     }
 }

@@ -8,4 +8,10 @@
     <StartupObject></StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="RestSharp" Version="106.11.7" />
+    <PackageReference Include="WebSocket4Net" Version="0.15.2" />
+  </ItemGroup>
+
 </Project>
