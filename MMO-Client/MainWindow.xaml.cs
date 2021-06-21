@@ -12,18 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MMO_Client.Screens;
+using MMO_Client.Screens.LoginScreen;
+using MMO_Client.Common.Logger;
 
 namespace MMO_Client
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+            new Logger();
             new LoginScreen().Show();
         }
     }
