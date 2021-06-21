@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MMO_Client.Screens;
 
 namespace MMO_Client
 {
@@ -23,6 +24,7 @@ namespace MMO_Client
         public MainWindow()
         {
             InitializeComponent();
+            new LoginScreen().Show();
         }
     }
 }
