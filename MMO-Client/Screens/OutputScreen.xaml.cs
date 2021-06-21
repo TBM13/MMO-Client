@@ -47,7 +47,7 @@ namespace MMO_Client.Screens.OutputScreen
         private void ScrollToEnd()
         {
             //This checks if scrollbar is at bottom, but when scrollbar is changed to visible not working.
-            if (RTB.VerticalOffset + RTB.ViewportHeight != RTB.ExtentHeight) return;
+            if (RTB.VerticalOffset + RTB.ViewportHeight < RTB.ExtentHeight) return;
             RTB.ScrollToEnd();
         }
 
