@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MMO_Client.Common
+namespace MMO_Client.Common.Logger
 {
     public class Logger
     {

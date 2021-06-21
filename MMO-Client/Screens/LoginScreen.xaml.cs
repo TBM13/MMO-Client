@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using MMO_Client.Common; // A
+using MMO_Client.Common.Logger;
 using MMO_Client.Common.Events;
 
 namespace MMO_Client.Screens
