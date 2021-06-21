@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMO-Client", "MMO-Client.csproj", "{03D9D57E-B392-45D1-850C-129EB3E2EA49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMO-Client", "MMO-Client\MMO-Client.csproj", "{D1EFFE52-214A-47D4-9766-7E18BB7D9F7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{03D9D57E-B392-45D1-850C-129EB3E2EA49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{03D9D57E-B392-45D1-850C-129EB3E2EA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{03D9D57E-B392-45D1-850C-129EB3E2EA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{03D9D57E-B392-45D1-850C-129EB3E2EA49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1EFFE52-214A-47D4-9766-7E18BB7D9F7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1EFFE52-214A-47D4-9766-7E18BB7D9F7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1EFFE52-214A-47D4-9766-7E18BB7D9F7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1EFFE52-214A-47D4-9766-7E18BB7D9F7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A60152FF-5C33-425A-90EB-53070DAFD492}
+		SolutionGuid = {C9EA1D0F-5754-4166-82D7-C0495706C8F0}
 	EndGlobalSection
 EndGlobal
