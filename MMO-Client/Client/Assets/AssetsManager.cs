@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Windows.Media;
 using MMO_Client.Common;
@@ -24,7 +20,10 @@ namespace MMO_Client.Client.Assets
             instance = this;
 
             if (!Directory.Exists(AssetsPath))
+            {
                 Directory.CreateDirectory(AssetsPath);
+                Logger.Warn("Assets folder didn't exist, so we created it", title);
+            }
 
             Logger.Info("Assets Manager Created", title);
         }
@@ -39,7 +38,7 @@ namespace MMO_Client.Client.Assets
                     if (v.IsFree)
                     {
                         Logger.Debug($"Recycling free vector asset {ID}", title);
-                        v.IsFree = false;
+                        v.Recycle();
                         return v;
                     }
 
@@ -57,13 +56,9 @@ namespace MMO_Client.Client.Assets
             {
                 Logger.Debug($"Cloning vector asset {ID}", title);
 
-                newAsset.Drawing = assetToClone.Drawing;
-                newAsset.Frames = assetToClone.Frames;
-                newAsset.MaxBounds = assetToClone.MaxBounds;
+                newAsset.Initialize(assetToClone.InitialDrawing, assetToClone.Frames, assetToClone.MaxBounds);
                 newAsset.FPS = assetToClone.FPS;
                 newAsset.Loop = assetToClone.Loop;
-
-                newAsset.Draw(newAsset.Drawing);
             } 
             else
             {
@@ -73,7 +68,7 @@ namespace MMO_Client.Client.Assets
                 string[] splittedID = ID.Split(".");
                 foreach(string s in splittedID)
                 {
-                    path += @"\s";
+                    path += $@"\{s}";
 
                     if (!Directory.Exists(path))
                         Directory.CreateDirectory(path);
@@ -83,8 +78,8 @@ namespace MMO_Client.Client.Assets
                 DrawingGroup drawing = Xaml2Drawing(path);
                 if (drawing == null)
                 {
-                    Logger.Error($"Couldn't get the drawing of {ID}", title);
-                    drawing = Xaml2Drawing("pack://application:,,,/Client/Assets/error.xaml");
+                    Logger.Error($"Couldn't get the drawing of the asset \"{ID}\"", title);
+                    drawing = Xaml2Drawing($@"{AssetsPath}\MMOClient\error.xaml");
                 }
                 
                 newAsset.Initialize(drawing);
@@ -102,7 +97,7 @@ namespace MMO_Client.Client.Assets
                     return null;
             }
 
-            Logger.Debug("Converting XAML to Drawing...", title);
+            Logger.Debug($"Converting XAML to Drawing ({xamlPath})", title);
             using StreamReader streamReader = new(xamlPath);
             return (DrawingGroup)XamlReader.Load(streamReader.BaseStream);
         }
@@ -115,7 +110,7 @@ namespace MMO_Client.Client.Assets
                 return false;
             }
 
-            Logger.Debug("Converting ZAML to XAML...", title);
+            Logger.Debug($"Converting ZAML to XAML ({zamlPath})", title);
             using FileStream originalFileStream = new(zamlPath, FileMode.Open, FileAccess.Read);
 
             string newFilePath = zamlPath.Replace(".zaml", ".xaml");

@@ -8,6 +8,7 @@ using System.Windows;
 using MMO_Client.Client.Net;
 using MMO_Client.Common;
 using MMO_Client.Screens;
+using MMO_Client.Client.Assets;
 
 namespace MMO_Client
 {
@@ -15,12 +16,14 @@ namespace MMO_Client
     {
         private NetworkManager Net = new();
         private LoginService LoginManager = new();
+
         void App_Startup(object sender, StartupEventArgs args) =>
             Setup();
 
         private void Setup()
         {
-            new Logger();
+            _ = new Logger();
+            _ = new AssetsManager();
 
             Logger.Info("Loading Login Screen", "Main");
             LoginScreen loginScreen = new();

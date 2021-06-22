@@ -2,7 +2,10 @@
 {
     class Asset
     {
-        public bool IsFree = true;
-        public string ID = "UNDEFINED ASSET";
+        public bool IsFree { get; set; } = false;
+        public string ID { get; init; } = "UNDEFINED ASSET";
+
+        public virtual void Free() =>
+            IsFree = true;
     }
 }

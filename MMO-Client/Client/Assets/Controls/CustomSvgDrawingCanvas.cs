@@ -1,23 +1,14 @@
 ﻿using System;
-using System.Xml;
-using System.IO;
-using System.IO.Compression;
-using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Markup;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-using SharpVectors.Runtime.Utils;
-
-using IoPath = System.IO.Path;
 using SharpVectors.Runtime;
 using SharpVectors;
 
