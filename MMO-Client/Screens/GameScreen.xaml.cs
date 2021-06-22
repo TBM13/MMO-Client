@@ -27,11 +27,12 @@ namespace MMO_Client.Screens
         {
             InitializeComponent();
 
-            /*WpfDrawingSettings settings = new();
-            FileSvgConverter converter = new(settings);
-            converter.Convert(@".\Assets\Test\1.svg");
+            /* WpfDrawingSettings settings = new();
+             DirectorySvgConverter converter = new(settings);
+             converter.Convert(new DirectoryInfo(@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC"), new DirectoryInfo(@".\Assets\Test\"));
+            */
 
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            /*System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             VectorAsset lastAsset = null;
 
@@ -42,6 +43,14 @@ namespace MMO_Client.Screens
             }
 
             sw.Stop(); // 1300 ms*/
+
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            VectorAsset asset = AssetsManager.CreateVectorAsset("test.1");
+            grid.Children.Add(asset.Viewbox);
+            sw.Stop();
+            asset.Loop = true;
+            asset.StartAnimation();
 
             //webClient.DownloadFile(@"https://static.klarix.cf/1.zaml", @".\cache\1.zaml");
         }

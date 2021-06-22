@@ -539,10 +539,8 @@ namespace MMO_Client.Client.Assets.Controls
         {
             try
             {
-                if (drawing == null || _drawingCanvas == null)
-                {
+                if (drawing == null)
                     return;
-                }
 
                 // Clear the current drawing
                 this.OnUnloadDiagram();

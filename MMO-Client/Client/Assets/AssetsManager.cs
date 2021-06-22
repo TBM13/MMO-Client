@@ -74,15 +74,34 @@ namespace MMO_Client.Client.Assets
                         Directory.CreateDirectory(path);
                 }
 
-                path += ".xaml";
-                DrawingGroup drawing = Xaml2Drawing(path);
+                DrawingGroup drawing = Xaml2Drawing(path + @"\1.xaml");
+                List<DrawingGroup> frames = null;
+
                 if (drawing == null)
                 {
                     Logger.Error($"Couldn't get the drawing of the asset \"{ID}\"", title);
                     drawing = Xaml2Drawing($@"{AssetsPath}\MMOClient\error.xaml");
                 }
-                
-                newAsset.Initialize(drawing);
+                else
+                {
+                    int framesCount = Directory.GetFiles(path).Length;
+                    if (framesCount > 1)
+                    {
+                        frames = new List<DrawingGroup> { drawing };
+                        for (int i = 1; i < framesCount; i++)
+                        {
+                            DrawingGroup d = Xaml2Drawing(path + $@"\{i + 1}.xaml");
+                            frames.Add(d);
+                        }
+                    }
+
+                    Logger.Debug($"Loaded {frames.Count} frames for {ID}", title);
+                }
+
+                if (frames == null)
+                    newAsset.Initialize(drawing);
+                else
+                    newAsset.Initialize(drawing, frames);
             }
 
             vectorPool.Add(newAsset);
@@ -97,7 +116,6 @@ namespace MMO_Client.Client.Assets
                     return null;
             }
 
-            Logger.Debug($"Converting XAML to Drawing ({xamlPath})", title);
             using StreamReader streamReader = new(xamlPath);
             return (DrawingGroup)XamlReader.Load(streamReader.BaseStream);
         }
@@ -109,8 +127,7 @@ namespace MMO_Client.Client.Assets
                 // TODO: Request SVG to server
                 return false;
             }
-
-            Logger.Debug($"Converting ZAML to XAML ({zamlPath})", title);
+;
             using FileStream originalFileStream = new(zamlPath, FileMode.Open, FileAccess.Read);
 
             string newFilePath = zamlPath.Replace(".zaml", ".xaml");

@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 
 using SharpVectors.Runtime;
 using SharpVectors;
@@ -21,7 +19,7 @@ namespace MMO_Client.Client.Assets.Controls
     {
         #region Private Fields
 
-        private const string DefaultTitle = "SharpVectors";
+        private const string DefaultTitle = "CustomSvgDrawingCanvas";
 
         private string _appTitle;
         private bool _drawForInteractivity;
@@ -33,14 +31,8 @@ namespace MMO_Client.Client.Assets.Controls
         private double _offsetX;
         private double _offsetY;
 
-        private ToolTip _tooltip;
-        private TextBlock _tooltipText;
-
         private DrawingGroup _wholeDrawing;
         private DrawingGroup _linksDrawing;
-        private DrawingGroup _mainDrawing;
-
-        private Drawing _hitVisual;
 
         private DrawingVisual _hostVisual;
 
@@ -61,8 +53,8 @@ namespace MMO_Client.Client.Assets.Controls
 
         static CustomSvgDrawingCanvas()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SvgDrawingCanvas),
-                new FrameworkPropertyMetadata(typeof(SvgDrawingCanvas)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomSvgDrawingCanvas),
+                new FrameworkPropertyMetadata(typeof(CustomSvgDrawingCanvas)));
         }
 
         public CustomSvgDrawingCanvas()
@@ -76,34 +68,6 @@ namespace MMO_Client.Client.Assets.Controls
 
             _displayTransform = Transform.Identity;
 
-            // Create a tooltip and set its position.
-            _tooltip = new ToolTip();
-            _tooltip.Placement = PlacementMode.MousePoint;
-            _tooltip.PlacementRectangle = new Rect(50, 0, 0, 0);
-            _tooltip.HorizontalOffset = 20;
-            _tooltip.VerticalOffset = 20;
-
-            _tooltipText = new TextBlock();
-            _tooltipText.Text = string.Empty;
-            _tooltipText.Margin = new Thickness(6, 0, 0, 0);
-
-            //Create BulletDecorator and set it as the tooltip content.
-            Ellipse bullet = new Ellipse();
-            bullet.Height = 10;
-            bullet.Width = 10;
-            bullet.Fill = Brushes.LightCyan;
-
-            BulletDecorator decorator = new BulletDecorator();
-            decorator.Bullet = bullet;
-            decorator.Margin = new Thickness(0, 0, 10, 0);
-            decorator.Child = _tooltipText;
-
-            _tooltip.Content = decorator;
-            _tooltip.IsOpen = false;
-            _tooltip.Visibility = Visibility.Hidden;
-
-            //Finally, set tooltip on this canvas
-            this.ToolTip = _tooltip;
             this.Background = Brushes.Transparent;
 
             this.SnapsToDevicePixels = true;
@@ -163,7 +127,7 @@ namespace MMO_Client.Client.Assets.Controls
         {
             get
             {
-                return new Point(_offsetX, _offsetY);
+                return new(_offsetX, _offsetY);
             }
         }
 
@@ -239,59 +203,6 @@ namespace MMO_Client.Client.Assets.Controls
         #endregion
 
         #region Public Methods
-
-        /*public void LoadDiagrams(string fileName)
-        {
-            if (string.IsNullOrWhiteSpace(fileName) || !File.Exists(fileName))
-            {
-                return;
-            }
-
-            this.UnloadDiagrams();
-
-            string fileExt = IoPath.GetExtension(fileName);
-
-            Cursor curCursor = this.Cursor;
-            this.Cursor = Cursors.Wait;
-            try
-            {
-                object xamlObject = null;
-
-                if (string.Equals(fileExt, ".xaml", StringComparison.OrdinalIgnoreCase))
-                {
-                    using (XmlReader xmlReader = XmlReader.Create(new StreamReader(fileName)))
-                    {
-                        xamlObject = XamlReader.Load(xmlReader);
-                    }
-                }
-                else if (string.Equals(fileExt, ".zaml", StringComparison.OrdinalIgnoreCase))
-                {
-                    using (FileStream fileStream = File.OpenRead(fileName))
-                    {
-                        using (GZipStream zipStream = new GZipStream(fileStream, CompressionMode.Decompress))
-                        {
-                            xamlObject = XamlReader.Load(zipStream);
-                        }
-                    }
-                }
-
-                if (xamlObject is SvgImageNameScope)
-                {
-                    SvgImageNameScope imageDrawing = (SvgImageNameScope)xamlObject;
-                    RenderDiagrams(imageDrawing);
-                }
-                else if (xamlObject is DrawingGroup)
-                {
-                    DrawingGroup groupDrawing = (DrawingGroup)xamlObject;
-                    RenderDiagrams(groupDrawing);
-                }
-            }
-            finally
-            {
-                this.Cursor = curCursor;
-            }
-        }*/
-
         public void LoadDiagrams(DrawingGroup whole, DrawingGroup links, DrawingGroup main, Rect maxBounds)
         {
             if (whole == null)
@@ -305,7 +216,6 @@ namespace MMO_Client.Client.Assets.Controls
 
             _wholeDrawing = whole;
             _linksDrawing = links;
-            _mainDrawing = main;
 
             this.InvalidateMeasure();
         }
@@ -314,7 +224,7 @@ namespace MMO_Client.Client.Assets.Controls
         {
             _offsetX = 0;
             _offsetY = 0;
-            _bounds = new Rect(0, 0, 1, 1);
+            _bounds = new(0, 0, 1, 1);
 
             _wholeDrawing = null;
 
@@ -332,22 +242,6 @@ namespace MMO_Client.Client.Assets.Controls
         }
 
         #region RenderDiagrams Methods
-
-        /*public void RenderDiagrams(SvgImageNameScope image)
-        {
-            DrawingImage drawingImage = image.Source as DrawingImage;
-            if (drawingImage == null)
-            {
-                return;
-            }
-
-            DrawingGroup renderedGroup = drawingImage.Drawing as DrawingGroup;
-
-            if (renderedGroup != null)
-            {
-                this.RenderDiagrams(renderedGroup);
-            }
-        }*/
 
         public void RenderDiagrams(DrawingGroup renderedGroup, Rect maxBounds)
         {
@@ -418,23 +312,23 @@ namespace MMO_Client.Client.Assets.Controls
                     double diaHeight = rectBounds.Height;
 
                     _bounds = rectBounds;
-                    return new Size(diaWidth, diaHeight);
+                    return new(diaWidth, diaHeight);
                 }
             }
             else
             {
                 double dWidth = this.Width;
                 double dHeight = this.Height;
-                if ((!Double.IsNaN(dWidth) && !Double.IsInfinity(dWidth)) &&
-                    (!Double.IsNaN(dHeight) && !Double.IsInfinity(dHeight)))
+                if ((!double.IsNaN(dWidth) && !double.IsInfinity(dWidth)) &&
+                    (!double.IsNaN(dHeight) && !double.IsInfinity(dHeight)))
                 {
-                    return new Size(dWidth, dHeight);
+                    return new(dWidth, dHeight);
                 }
             }
 
             var sizeCtrl = base.MeasureOverride(constraint);
-            if ((!Double.IsNaN(sizeCtrl.Width) && !Double.IsInfinity(sizeCtrl.Width)) &&
-                (!Double.IsNaN(sizeCtrl.Height) && !Double.IsInfinity(sizeCtrl.Height)))
+            if ((!double.IsNaN(sizeCtrl.Width) && !double.IsInfinity(sizeCtrl.Width)) &&
+                (!double.IsNaN(sizeCtrl.Height) && !double.IsInfinity(sizeCtrl.Height)))
             {
                 if (sizeCtrl.Width != 0 && sizeCtrl.Height != 0)
                 {
@@ -442,181 +336,17 @@ namespace MMO_Client.Client.Assets.Controls
                 }
             }
 
-            return new Size(120, 120);
+            return new(120, 120);
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
-
-            Point pt = e.GetPosition(this);
-
-            Drawing visual = HitTest(pt);
-            if (visual == null)
-            {
-                if (_tooltip != null)
-                {
-                    _tooltip.IsOpen = false;
-                    _tooltip.Visibility = Visibility.Hidden;
-                }
-
-                //                this.Cursor = Cursors.Arrow;
-                return;
-            }
-
-            string itemName = SvgObject.GetName(visual);
-            if (itemName == null)
-            {
-                if (_tooltip != null)
-                {
-                    _tooltip.IsOpen = false;
-                    _tooltip.Visibility = Visibility.Hidden;
-                }
-
-                return;
-            }
-            //Brush brush = null;
-            //if (_visualBrushes.ContainsKey(itemName))
-            //{
-            //    brush = _visualBrushes[itemName];
-            //}
-            //if (brush == null)
-            //{
-            //    if (_tooltip != null)
-            //    {
-            //        _tooltip.IsOpen = false;
-            //        _tooltip.Visibility = Visibility.Hidden;
-            //    }
-
-            //    return;
-            //}
-
-            //if (e.ChangedButton == MouseButton.Left)
-            //{
-            //    string brushName = SvgObject.GetName(visual);
-            //    if (!string.IsNullOrWhiteSpace(brushName))
-            //    {
-            //        SvgLinkAction linkAction = SvgLink.GetLinkAction(visual);
-            //        if (linkAction == SvgLinkAction.LinkHtml ||
-            //            linkAction == SvgLinkAction.LinkPage)
-            //        {
-            //            _animator.Start(brushName, brush);
-            //        }
-            //    }
-            //}
-            //else if (e.ChangedButton == MouseButton.Right)
-            //{
-            //    _animator.Stop();
-            //}
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
-
-            // Retrieve the coordinates of the mouse button event.
-            Point pt = e.GetPosition(this);
-
-            Drawing hitVisual = HitTest(pt);
-
-            //string itemName = null;
-
-            if (hitVisual == null)
-            {
-                //                this.Cursor = Cursors.Arrow;
-
-                if (_hitVisual != null)
-                {
-                    //itemName = SvgObject.GetName(_hitVisual);
-                    //if (itemName == null)
-                    //{
-                    //    _hitVisual = null;
-                    //    return;
-                    //}
-                    //if (_visualBrushes.ContainsKey(itemName))
-                    //{
-                    //    Brush brush = _visualBrushes[itemName];
-                    //    brush.Opacity = 0;
-                    //}
-                    _hitVisual = null;
-                }
-
-                if (_tooltip != null)
-                {
-                    _tooltip.IsOpen = false;
-                    _tooltip.Visibility = Visibility.Hidden;
-                }
-
-                return;
-            }
-            else
-            {
-                //                this.Cursor = Cursors.Hand;
-
-                if (hitVisual == _hitVisual)
-                {
-                    return;
-                }
-
-                if (_hitVisual != null)
-                {
-                    //itemName = SvgObject.GetName(_hitVisual);
-                    //if (itemName == null)
-                    //{
-                    //    _hitVisual = null;
-                    //    return;
-                    //}
-                    //if (_visualBrushes.ContainsKey(itemName))
-                    //{
-                    //    Brush brush = _visualBrushes[itemName];
-                    //    brush.Opacity = 0;
-                    //}
-                    _hitVisual = null;
-                }
-
-                //itemName = SvgObject.GetName(hitVisual);
-                //if (itemName == null)
-                //{
-                //    return;
-                //}
-                //if (_visualBrushes.ContainsKey(itemName))
-                //{
-                //    Brush brush = _visualBrushes[itemName];
-                //    brush.Opacity = 0.5;
-                //}
-                _hitVisual = hitVisual;
-
-                string tooltipText = SvgObject.GetTitle(_hitVisual);
-                Rect rectBounds = _hitVisual.Bounds;
-                //Drawing drawing = _hitVisual.GetValue(FrameworkElement.TagProperty) as Drawing;
-                //if (drawing != null)
-                //{
-                //    rectBounds  = drawing.Bounds; 
-                //    tooltipText = SvgObject.GetTitle(drawing);
-                //}
-
-                if (_tooltip != null && !string.IsNullOrWhiteSpace(tooltipText))
-                {
-                    _tooltip.PlacementRectangle = rectBounds;
-
-                    _tooltipText.Text = tooltipText;
-
-                    if (_tooltip.Visibility == Visibility.Hidden)
-                    {
-                        _tooltip.Visibility = Visibility.Visible;
-                    }
-
-                    _tooltip.IsOpen = true;
-                }
-                else
-                {
-                    if (_tooltip != null)
-                    {
-                        _tooltip.IsOpen = false;
-                        _tooltip.Visibility = Visibility.Hidden;
-                    }
-                }
-            }
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
@@ -627,32 +357,6 @@ namespace MMO_Client.Client.Assets.Controls
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-
-            if (_tooltip != null)
-            {
-                _tooltip.IsOpen = false;
-                _tooltip.Visibility = Visibility.Hidden;
-            }
-
-            if (_hitVisual == null)
-            {
-                return;
-            }
-
-            string itemName = SvgObject.GetName(_hitVisual);
-            if (itemName == null)
-            {
-                _hitVisual = null;
-                return;
-            }
-            //if (_visualBrushes.ContainsKey(itemName))
-            //{
-            //    Brush brush = _visualBrushes[itemName];
-            //    brush.Opacity = 0;
-            //}
-            _hitVisual = null;
-
-            //            this.Cursor = Cursors.Arrow;
         }
 
         protected virtual void OnHandleAlert(string message)
@@ -768,7 +472,7 @@ namespace MMO_Client.Client.Assets.Controls
 
         private void Draw(DrawingGroup group, DrawingGroup main, Rect maxBounds)
         {
-            DrawingVisual drawingVisual = new DrawingVisual();
+            DrawingVisual drawingVisual = new();
 
             DrawingContext drawingContext = drawingVisual.RenderOpen();
 
@@ -835,48 +539,6 @@ namespace MMO_Client.Client.Assets.Controls
             }
         }
 
-        //private void Draw(DrawingGroup group)
-        //{
-        //    DrawingVisual drawingVisual = new DrawingVisual();
-
-        //    DrawingContext drawingContext = drawingVisual.RenderOpen();
-
-        //    if (_offsetTransform != null)
-        //    {
-        //        drawingContext.PushTransform(_offsetTransform);
-        //    }
-
-        //    drawingContext.DrawDrawing(group);
-
-        //    if (_offsetTransform != null)
-        //    {
-        //        drawingContext.Pop();
-        //    }
-
-        //    drawingContext.DrawDrawing(group);
-        //    drawingVisual.Opacity = group.Opacity;
-
-        //    Transform transform = group.Transform;
-        //    if (transform != null)
-        //    {
-        //        drawingVisual.Transform = transform;
-        //    }
-        //    Geometry clipGeometry = group.ClipGeometry;
-        //    if (clipGeometry != null)
-        //    {
-        //        drawingVisual.Clip = clipGeometry;
-        //    }
-
-        //    drawingContext.Close();
-
-        //    this.AddVisual(drawingVisual);
-
-        //    if (_drawForInteractivity)
-        //    {
-        //        this.EnumerateDrawings(group);
-        //    }
-        //}
-
         private void EnumerateDrawings(DrawingGroup group)
         {
             if (group == null || group == _linksDrawing)
@@ -888,8 +550,7 @@ namespace MMO_Client.Client.Assets.Controls
             for (int i = 0; i < drawings.Count; i++)
             {
                 Drawing drawing = drawings[i];
-                DrawingGroup childGroup = drawing as DrawingGroup;
-                if (childGroup != null)
+                if (drawing is DrawingGroup childGroup)
                 {
                     SvgObjectType objectType = SvgObject.GetType(childGroup);
                     if (objectType == SvgObjectType.Link)
@@ -987,96 +648,6 @@ namespace MMO_Client.Client.Assets.Controls
                 }
             }
 
-            //if (_testHit != null)
-            //{
-            //    if (_testHitBrush != null)
-            //    {
-            //        _testHit.Brush = _testHitBrush;
-            //    }
-            //    else if (_testHitPen != null && _testHitBrushPen != null)
-            //    {
-            //        _testHit.Pen.Brush = _testHitBrushPen;
-            //    }
-
-            //    _testHit = null;
-            //    _testHitPen = null;
-            //    _testHitBrush = null;
-            //}
-            //if (_testHitGroup != null)
-            //{
-            //    _testHitGroup.BitmapEffect = null;
-            //    _testHitGroup = null;
-            //}
-
-            //_testHit = foundDrawing as GeometryDrawing;
-            //if (_testHit != null)
-            //{
-            //    _testHitBrush = _testHit.Brush;
-            //    _testHitPen = _testHit.Pen;
-
-            //    // Create and animate a Brush to set the button's Background.
-            //    SolidColorBrush animationBrush = new SolidColorBrush();
-            //    animationBrush.Color = Colors.Blue;
-
-            //    ColorAnimation colorAnimation = new ColorAnimation();
-            //    colorAnimation.From           = Colors.Blue;
-            //    colorAnimation.To             = Colors.Red;
-            //    colorAnimation.Duration       = new Duration(TimeSpan.FromMilliseconds(1000));
-            //    colorAnimation.AutoReverse    = true;
-            //    colorAnimation.RepeatBehavior = RepeatBehavior.Forever;
-
-            //    if (_testHitBrush != null)
-            //    {
-            //        _testHit.Brush = animationBrush;
-            //    }
-            //    else if (_testHitPen != null)
-            //    {
-            //        _testHitBrushPen  = _testHitPen.Brush;
-            //        _testHitPen.Brush = animationBrush;
-            //    }
-
-            //    // Apply the animation to the brush's Color property.
-            //    //animationBrush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnimation);
-            //}
-            //else
-            //{
-            //    _testHitGroup = foundDrawing as DrawingGroup;
-            //    if (_testHitGroup != null)
-            //    {
-            //        //// Create a blur effect.
-            //        //BlurBitmapEffect blurEffect = new BlurBitmapEffect();
-            //        //blurEffect.Radius = 3.0;
-
-            //        //// Apply it to the drawing group.
-            //        //_testHitGroup.BitmapEffect = blurEffect;
-
-            //        // Initialize a new OuterGlowBitmapEffect that will be applied
-            //        // to the TextBox.
-            //        OuterGlowBitmapEffect glowEffect = new OuterGlowBitmapEffect();
-
-            //        // Set the size of the glow to 30 pixels.
-            //        glowEffect.GlowSize = 3;
-
-            //        // Set the color of the glow to blue.
-            //        Color glowColor = new Color();
-            //        glowColor.ScA = 1;
-            //        glowColor.ScB = 0;
-            //        glowColor.ScG = 0;
-            //        glowColor.ScR = 1;
-            //        glowEffect.GlowColor = glowColor;
-
-            //        // Set the noise of the effect to the maximum possible (range 0-1).
-            //        glowEffect.Noise = 0;
-
-            //        // Set the Opacity of the effect to 75%. Note that the same effect
-            //        // could be done by setting the ScA property of the Color to 0.75.
-            //        glowEffect.Opacity = 0.5;
-
-            //        // Apply the bitmap effect to the TextBox.
-            //        _testHitGroup.BitmapEffect = glowEffect;
-            //    }
-            //}   
-
             return foundDrawing;
         }
 
@@ -1104,10 +675,9 @@ namespace MMO_Client.Client.Assets.Controls
                 {
                     Geometry geometry = drawing.Geometry;
 
-                    EllipseGeometry ellipse = null;
                     RectangleGeometry rectangle = null;
                     PathGeometry path = null;
-                    if (TryCast.Cast(geometry, out ellipse))
+                    if (TryCast.Cast(geometry, out EllipseGeometry ellipse))
                     {
                         if (ellipse.FillContains(pt))
                         {
