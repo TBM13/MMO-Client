@@ -1,0 +1,19 @@
+﻿<DrawingGroup xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:svg="http://sharpvectors.codeplex.com/runtime/">
+  <DrawingGroup x:Name="_SvgDrawingLayer" svg:SvgLink.Key="_SvgDrawingLayer">
+    <DrawingGroup.ClipGeometry>
+      <RectangleGeometry Rect="0,0,64,64" />
+    </DrawingGroup.ClipGeometry>
+    <GeometryDrawing Brush="#FFFF0000" svg:SvgObject.Class="st0">
+      <GeometryDrawing.Geometry>
+        <RectangleGeometry RadiusX="0" RadiusY="0" Rect="0,0,64,64" />
+      </GeometryDrawing.Geometry>
+    </GeometryDrawing>
+    <DrawingGroup svg:SvgObject.Class="st1">
+      <GeometryDrawing Brush="#FFFFFFFF" svg:SvgObject.Class="st2">
+        <GeometryDrawing.Geometry>
+          <PathGeometry FillRule="Nonzero" Figures="M21.9,44.6C21.9,41.4 26,39.2 31.9,39.2 37.9,39.2 41.8,41.400000000000006 41.9,44.6 41.9,47.7 38,49.9 31.9,49.9 26,49.9 21.9,47.7 21.9,44.6z M25.6,36.3L23.1,9.6 40.900000000000006,9.6 38.400000000000006,36.3 25.6,36.3z" />
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+    </DrawingGroup>
+  </DrawingGroup>
+</DrawingGroup>

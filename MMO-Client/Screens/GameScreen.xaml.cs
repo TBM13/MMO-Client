@@ -49,16 +49,5 @@ namespace MMO_Client.Screens.GameScreen
             grid.Children.Add(vA);
             vA.StartAnimation();*/
         }
-
-        private void Zaml2Xaml(string zamlPath)
-        {
-            using FileStream originalFileStream = new(zamlPath, FileMode.Open, FileAccess.Read);
-
-            string newFilePath = zamlPath.Replace(".zaml", ".xaml");
-            using FileStream decompressedFileStream = File.Create(newFilePath);
-            using GZipStream decompressionStream = new(originalFileStream, CompressionMode.Decompress);
-
-            decompressionStream.CopyTo(decompressedFileStream);
-        }
     }
 }

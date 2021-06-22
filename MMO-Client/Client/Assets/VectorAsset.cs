@@ -9,46 +9,49 @@ namespace MMO_Client.Client.Assets
 {
     class VectorAsset : Asset
     {
-        public readonly CustomSvgViewbox Viewbox;
+        public CustomSvgViewbox Viewbox;
+
+        public DrawingGroup Drawing;
+        public List<DrawingGroup> Frames = null;
+        public Rect MaxBounds;
         public int FPS = 24;
         public bool Loop;
 
-        private readonly List<DrawingGroup> frames = null;
         private bool playingAnimation = false;
-        private readonly Rect maxBounds;
 
-        public VectorAsset() { }
-
-        public VectorAsset(DrawingGroup drawing)
-        {
+        public VectorAsset() => 
             Viewbox = new();
-            maxBounds = drawing.Bounds;
+
+        public void Initialize(DrawingGroup drawing)
+        {
+            Drawing = drawing;
+            MaxBounds = drawing.Bounds;
 
             Draw(drawing);
         }
 
-        public VectorAsset(DrawingGroup drawing, List<DrawingGroup> frames, bool loop)
+        public void Initialize(DrawingGroup drawing, List<DrawingGroup> frames, bool loop)
         {
-            Viewbox = new();
+            Drawing = drawing;
 
-            this.frames = frames;
+            Frames = frames;
             Loop = loop;
 
-            maxBounds = drawing.Bounds;
-            foreach(DrawingGroup d in frames)
+            MaxBounds = drawing.Bounds;
+            foreach (DrawingGroup d in frames)
             {
-                if (d.Bounds.X > maxBounds.X)
-                    maxBounds.X = d.Bounds.X;
+                if (d.Bounds.X > MaxBounds.X)
+                    MaxBounds.X = d.Bounds.X;
 
-                if (d.Bounds.Y > maxBounds.Y)
-                    maxBounds.Y = d.Bounds.Y;
+                if (d.Bounds.Y > MaxBounds.Y)
+                    MaxBounds.Y = d.Bounds.Y;
             }
 
             Draw(drawing);
         }
 
         public void Draw(DrawingGroup drawing) => 
-            Viewbox.AddDrawing(drawing, maxBounds);
+            Viewbox.AddDrawing(drawing, MaxBounds);
 
         public async void StartAnimation()
         {
@@ -58,7 +61,7 @@ namespace MMO_Client.Client.Assets
                 return;
             }
 
-            if (frames == null)
+            if (Frames == null)
             {
                 Logger.Warn("No animation frames provided", ID);
                 return;
@@ -73,7 +76,7 @@ namespace MMO_Client.Client.Assets
             {
                 await Task.Delay(delayTime);
                 frame++;
-                if (frame == frames.Count)
+                if (frame == Frames.Count)
                 {
                     if (Loop)
                         frame = 0;
@@ -84,7 +87,7 @@ namespace MMO_Client.Client.Assets
                     }
                 }
 
-                Draw(frames[frame]);
+                Draw(Frames[frame]);
             }
 
             Logger.Debug("Task End", ID);

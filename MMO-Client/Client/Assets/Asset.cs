@@ -2,7 +2,7 @@
 {
     class Asset
     {
-        public bool IsFree = false;
-        public string ID = "UNDEFINED";
+        public bool IsFree = true;
+        public string ID = "UNDEFINED ASSET";
     }
 }
