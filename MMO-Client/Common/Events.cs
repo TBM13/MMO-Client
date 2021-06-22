@@ -1,4 +1,4 @@
-﻿namespace MMO_Client.Common.Events
+﻿namespace MMO_Client.Common
 {
     public class Events
     {

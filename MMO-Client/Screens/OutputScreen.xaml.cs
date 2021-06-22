@@ -2,7 +2,7 @@
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace MMO_Client.Screens.OutputScreen
+namespace MMO_Client.Screens
 {
     public partial class OutputScreen : Window
     {

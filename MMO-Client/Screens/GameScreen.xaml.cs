@@ -18,7 +18,7 @@ using SharpVectors.Converters;
 using SharpVectors.Renderers.Wpf;
 using MMO_Client.Client.Assets;
 
-namespace MMO_Client.Screens.GameScreen
+namespace MMO_Client.Screens
 {
     public partial class GameScreen : Window
     {
@@ -27,9 +27,6 @@ namespace MMO_Client.Screens.GameScreen
         public GameScreen()
         {
             InitializeComponent();
-
-            if (!Directory.Exists(@".\cache"))
-                Directory.CreateDirectory(@".\cache");
 
             //webClient.DownloadFile(@"https://static.klarix.cf/1.zaml", @".\cache\1.zaml");
 

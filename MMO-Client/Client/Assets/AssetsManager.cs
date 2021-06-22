@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Windows.Media;
-using MMO_Client.Common.Logger;
+using MMO_Client.Common;
 
 namespace MMO_Client.Client.Assets
 {

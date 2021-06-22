@@ -1,4 +1,4 @@
-﻿using MMO_Client.Common.Logger;
+﻿using MMO_Client.Common;
 using SuperSocket.ClientEngine;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebSocket4Net;
 
-namespace MMO_Client.Client.Net.NetworkManager
+namespace MMO_Client.Client.Net
 {
     class NetworkManager
     {

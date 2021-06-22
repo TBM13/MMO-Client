@@ -1,4 +1,4 @@
-﻿using MMO_Client.Common.Logger;
+﻿using MMO_Client.Common;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MMO_Client.Client.Net.Api.ClientApi
+namespace MMO_Client.Client.Net.Api
 {
     class ClientApi
     {

@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using MMO_Client.Common.Events;
+using MMO_Client.Common;
 
-namespace MMO_Client.Screens.LoginScreen
+namespace MMO_Client.Screens
 {
     public partial class LoginScreen : Window
     {

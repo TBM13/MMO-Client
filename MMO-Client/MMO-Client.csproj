@@ -9,20 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Page Remove="Client\Assets\error.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Client\Assets\error.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Resource>
+    <Resource Include="Client\Assets\error.xaml"/>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="WebSocket4Net" Version="0.15.2" />
-	<PackageReference Include="SharpVectors" Version="1.7.5" />
+	  <PackageReference Include="SharpVectors" Version="1.7.5" />
   </ItemGroup>
 
 </Project>

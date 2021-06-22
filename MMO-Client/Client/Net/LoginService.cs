@@ -1,14 +1,13 @@
-﻿using MMO_Client.Client.Net.Api.ClientApi;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MMO_Client.Common.Events;
-using MMO_Client.Common.Logger;
+using MMO_Client.Common;
+using MMO_Client.Client.Net.Api;
 
-namespace MMO_Client.Client.Net.LoginService
+namespace MMO_Client.Client.Net
 {
     class LoginService
     {

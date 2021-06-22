@@ -2,9 +2,9 @@
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
-using MMO_Client.Screens.OutputScreen;
+using MMO_Client.Screens;
 
-namespace MMO_Client.Common.Logger
+namespace MMO_Client.Common
 {
     public class Logger
     {

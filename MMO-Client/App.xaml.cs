@@ -5,17 +5,16 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using MMO_Client.Client.Net.LoginService;
-using MMO_Client.Client.Net.NetworkManager;
-using MMO_Client.Common.Logger;
-using MMO_Client.Screens.LoginScreen;
+using MMO_Client.Client.Net;
+using MMO_Client.Common;
+using MMO_Client.Screens;
 
 namespace MMO_Client
 {
     public partial class App : Application
     {
-        private NetworkManager Net = new NetworkManager();
-        private LoginService LoginManager = new LoginService();
+        private NetworkManager Net = new();
+        private LoginService LoginManager = new();
         void App_Startup(object sender, StartupEventArgs args) =>
             Setup();
 
