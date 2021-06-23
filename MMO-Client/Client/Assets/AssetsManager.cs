@@ -14,6 +14,7 @@ namespace MMO_Client.Client.Assets
 
         private static AssetsManager instance;
         private readonly List<VectorAsset> vectorPool = new();
+        private readonly List<ImageAsset> imagePool = new();
 
         public AssetsManager()
         {
@@ -26,6 +27,65 @@ namespace MMO_Client.Client.Assets
             }
 
             Logger.Info("Assets Manager Created", title);
+        }
+
+        private ImageAsset GetOrCreateImageAsset(string ID)
+        {
+            ImageAsset assetToClone = null;
+            foreach (ImageAsset v in imagePool)
+            {
+                if (v.ID == ID)
+                {
+                    if (v.IsFree)
+                    {
+                        Logger.Debug($"Recycling free image asset {ID}", title);
+                        v.Recycle();
+                        return v;
+                    }
+
+                    assetToClone = v;
+                }
+            }
+
+            ImageAsset newAsset = new()
+            {
+                IsFree = false,
+                ID = ID
+            };
+
+            if (assetToClone != null)
+            {
+                Logger.Debug($"Cloning image asset {ID}", title);
+
+                newAsset.Initialize(assetToClone.InitialImage, assetToClone.Frames);
+                newAsset.FPS = assetToClone.FPS;
+                newAsset.Loop = assetToClone.Loop;
+            }
+            else
+            {
+                Logger.Debug($"Creating image asset {ID}", title);
+
+                string path = AssetsPath;
+                string[] splittedID = ID.Split(".");
+                for (int i = 0; i < splittedID.Length; i++)
+                {
+                    path += $@"\{splittedID[i]}";
+
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                        if (i == splittedID.Length - 1)
+                        {
+                            // TODO: Request image asset to server
+                        }
+                    }
+                }
+
+                newAsset.LoadFrames(path);
+            }
+
+            imagePool.Add(newAsset);
+            return newAsset;
         }
 
         private VectorAsset GetOrCreateVectorAsset(string ID)
@@ -149,5 +209,8 @@ namespace MMO_Client.Client.Assets
 
         public static VectorAsset CreateVectorAsset(string ID) => 
             instance.GetOrCreateVectorAsset(ID);
+
+        public static ImageAsset CreateImageAsset(string ID) =>
+            instance.GetOrCreateImageAsset(ID);
     }
 }

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using MMO_Client.Client.Assets;
 using MMO_Client.Common;
 
 namespace MMO_Client.Client.Assets
@@ -26,17 +21,30 @@ namespace MMO_Client.Client.Assets
         public ImageAsset()
         {
             Image = new();
+
             //RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.HighQuality);
             //RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.Linear);
             //RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.LowQuality);
             //RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.NearestNeighbor);
         }
 
+        public void Initialize(BitmapImage initialImage, List<BitmapImage> frames)
+        {
+            InitialImage = initialImage;
+            Frames = frames;
+
+            Draw(initialImage);
+        }
+
         public void LoadFrames(string directory)
         {
             int filesCount = Directory.GetFiles(directory).Length;
 
-            InitialImage = new BitmapImage(new Uri($@"{directory}\1.png", UriKind.RelativeOrAbsolute));
+            InitialImage = new();
+            InitialImage.BeginInit();
+            InitialImage.UriSource = new Uri($@"{directory}\1.png", UriKind.RelativeOrAbsolute);
+            InitialImage.CacheOption = BitmapCacheOption.OnLoad;
+            InitialImage.EndInit();
 
             if (filesCount > 1)
             {
@@ -62,6 +70,8 @@ namespace MMO_Client.Client.Assets
                         Frames.Add(frame);
                     }
                 }
+
+                Logger.Debug($"Loaded {Frames.Count} frames", ID);
             }
 
             Draw(InitialImage);
@@ -73,8 +83,10 @@ namespace MMO_Client.Client.Assets
             LastDrawnImage = image;
         }
 
-        public async void StartAnimation()
+        public async void StartAnimation(bool loop)
         {
+            Loop = loop;
+
             if (PlayingAnimation)
             {
                 Logger.Warn("Animation is already playing", ID);

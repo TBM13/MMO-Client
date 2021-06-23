@@ -50,17 +50,6 @@ namespace MMO_Client.Screens
 
                 content.Add(c);
             }*/
-
-            ImageAsset img = new();
-
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            img.LoadFrames(@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC");
-            sw.Stop();
-
-            canvas.Children.Add(img.Image);
-            img.Loop = true;
-            img.StartAnimation();
         }
     }
 }
