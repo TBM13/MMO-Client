@@ -27,32 +27,40 @@ namespace MMO_Client.Screens
         {
             InitializeComponent();
 
-            /* WpfDrawingSettings settings = new();
-             DirectorySvgConverter converter = new(settings);
-             converter.Convert(new DirectoryInfo(@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC"), new DirectoryInfo(@".\Assets\Test\"));
-            */
-
-            /*System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            VectorAsset lastAsset = null;
-
-            for (int i = 0; i < 1; i++)
+            /*List<string> content = new();
+            for (int i = 1; i < 664; i++)
             {
-                lastAsset = AssetsManager.CreateVectorAsset("test.1");
-                grid.Children.Add(lastAsset.Viewbox);
-            }
+                using StreamReader stream = new($@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC\{i}.png");
+                string c = stream.ReadToEnd();
 
-            sw.Stop(); // 1300 ms*/
+                bool reused = false;
+                for (int j = 0; j < content.Count; j++)
+                {
+                    if (content[j] == c)
+                    {
+                        reused = true;
+                        stream.Close();
+                        content.Add("asd");
+                        File.WriteAllText($@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC\{i}.png", $"{j + 1}");
+                        break;
+                    }
+                }
+
+                if (reused) continue;
+
+                content.Add(c);
+            }*/
+
+            ImageAsset img = new();
 
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            VectorAsset asset = AssetsManager.CreateVectorAsset("test.1");
-            grid.Children.Add(asset.Viewbox);
+            img.LoadFrames(@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC");
             sw.Stop();
-            asset.Loop = true;
-            asset.StartAnimation();
 
-            //webClient.DownloadFile(@"https://static.klarix.cf/1.zaml", @".\cache\1.zaml");
+            canvas.Children.Add(img.Image);
+            img.Loop = true;
+            img.StartAnimation();
         }
     }
 }

@@ -90,7 +90,7 @@ namespace MMO_Client.Client.Assets
                         frames = new List<DrawingGroup> { drawing };
                         for (int i = 1; i < framesCount; i++)
                         {
-                            DrawingGroup d = Xaml2Drawing(path + $@"\{i + 1}.xaml");
+                            DrawingGroup d = Xaml2Drawing(path + $@"\{i + 1}.xaml", frames);
                             frames.Add(d);
                         }
                     }
@@ -108,7 +108,7 @@ namespace MMO_Client.Client.Assets
             return newAsset;
         }
 
-        public static DrawingGroup Xaml2Drawing(string xamlPath)
+        public static DrawingGroup Xaml2Drawing(string xamlPath, List<DrawingGroup> frames = null)
         {
             if (!File.Exists(xamlPath))
             {
@@ -117,6 +117,15 @@ namespace MMO_Client.Client.Assets
             }
 
             using StreamReader streamReader = new(xamlPath);
+            if (frames != null)
+            {
+                /*string line = streamReader.Peek();
+                if (line.StartsWith(""))
+                {
+
+                }*/
+            }
+
             return (DrawingGroup)XamlReader.Load(streamReader.BaseStream);
         }
 
@@ -127,7 +136,7 @@ namespace MMO_Client.Client.Assets
                 // TODO: Request SVG to server
                 return false;
             }
-;
+
             using FileStream originalFileStream = new(zamlPath, FileMode.Open, FileAccess.Read);
 
             string newFilePath = zamlPath.Replace(".zaml", ".xaml");

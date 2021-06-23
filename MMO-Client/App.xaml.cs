@@ -25,6 +25,9 @@ namespace MMO_Client
             _ = new Logger();
             _ = new AssetsManager();
 
+            new GameScreen().Show();
+            return;
+
             Logger.Info("Loading Login Screen", "Main");
             LoginScreen loginScreen = new();
             loginScreen.OnLoginEvent += InitiateLogin;

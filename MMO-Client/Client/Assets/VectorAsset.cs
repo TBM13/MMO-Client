@@ -103,8 +103,6 @@ namespace MMO_Client.Client.Assets
 
                 Draw(Frames[frame]);
             }
-
-            Logger.Debug("Task End", ID);
         }
 
         public void StopAnimation() => 
