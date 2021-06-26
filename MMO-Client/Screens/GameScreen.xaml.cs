@@ -18,13 +18,21 @@ using SharpVectors.Converters;
 using SharpVectors.Renderers.Wpf;
 using MMO_Client.Client.Assets;
 using MMO_Client.Client.Assets.Controls;
+using MMO_Client.Client.World.Rooms;
+using Newtonsoft.Json.Linq;
 
 namespace MMO_Client.Screens
 {
     public partial class GameScreen : Window
     {
+        private static GameScreen instance;
+
+        public static double GameWidth { get => instance.canvas.Width; }
+        public static double GameHeight { get => instance.canvas.Height; }
+
         public GameScreen()
         {
+            instance = this;
             InitializeComponent();
 
             /*List<string> content = new();
@@ -50,6 +58,14 @@ namespace MMO_Client.Screens
 
                 content.Add(c);
             }*/
+
+
+
+            Room room = new(JObject.Parse(File.ReadAllText(@"E:\Usuario SSD\Nueva carpeta (6)\ROSEDAL2.json")));
+            canvas.Children.Add(room.Grid);
+
+            /*ImageAsset asset = AssetsManager.CreateImageAsset("test.monoPng300");
+            canvas.Children.Add(asset.Image);*/
         }
     }
 }
