@@ -62,7 +62,7 @@ namespace MMO_Client.Screens
 
 
             Room room = new(JObject.Parse(File.ReadAllText(@"E:\Usuario SSD\Nueva carpeta (6)\ROSEDAL2.json")));
-            canvas.Children.Add(room.Grid);
+            canvas.Children.Add(room.Canvas);
 
             /*ImageAsset asset = AssetsManager.CreateImageAsset("test.monoPng300");
             canvas.Children.Add(asset.Image);*/

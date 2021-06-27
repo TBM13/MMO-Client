@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -6,17 +7,18 @@ namespace MMO_Client.Client.World.Rooms
 {
     class Tile
     {
-        public int X { get; init; }
-        public int Y { get; init; }
+        public const double Width = 71 * 1.3;
+        public const double Height = 23 * 1.5;
+        public const int MarginX = 0;
+        public const int MarginY = 200;
+
+        public Rectangle Rectangle { get; private set; }
+        public Coord Coord;
         public bool Blocked { get; init; }
 
-        private const int marginX = 0;
-        private const int marginY = 200;
-
-        public Tile(int x, int y, bool blocked)
+        public Tile(Coord coord, bool blocked)
         {
-            X = x;
-            Y = y;
+            Coord = coord;
             Blocked = blocked;
 
             CreateTile();
@@ -24,22 +26,22 @@ namespace MMO_Client.Client.World.Rooms
 
         private void CreateTile()
         {
-            Rectangle rectangle = new()
+            Rectangle = new()
             {
-                Width = 71 * 1.3,
-                Height = 23 * 1.5,
+                Width = Width,
+                Height = Height,
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
 
-            rectangle.Margin = new Thickness((X * rectangle.Width ) + marginX,
-                                             (Y * rectangle.Height) + marginY, 0, 0);
+            Canvas.SetLeft(Rectangle, Coord.X * Width + MarginX);
+            Canvas.SetTop(Rectangle, Coord.Y * Height + MarginY);
 
-            rectangle.Stroke = Brushes.Black;
-            rectangle.Fill = Blocked ? Brushes.Red : null;
-            rectangle.Opacity = 0.5;
+            Rectangle.Stroke = Brushes.Black;
+            Rectangle.Fill = Blocked ? Brushes.Red : null;
+            Rectangle.Opacity = 0.5;
 
-            Room.CurrentRoom.TilesGrid.Children.Add(rectangle);
+            Room.CurrentRoom.Canvas.Children.Add(Rectangle);
         }
     }
 }

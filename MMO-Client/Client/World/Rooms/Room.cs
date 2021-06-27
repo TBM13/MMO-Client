@@ -16,19 +16,20 @@ namespace MMO_Client.Client.World.Rooms
     {
         public static Room CurrentRoom;
 
-        public Grid Grid { get; init; }
-        public Grid TilesGrid { get; private set; }
-
         public string Name { get; init; }
         public int ID { get; init; }
         public Size Size { get; private set; }
 
-        private Dictionary<int, Dictionary<int, Tile>> tilesMatrix;
+        public Canvas Canvas { get; init; }
+        public Dictionary<int, Dictionary<int, Tile>> TilesMatrix { get; private set; }
 
         public Room(dynamic roomData)
         {
             CurrentRoom = this;
-            Grid = new();
+            Canvas = new()
+            {
+                RenderTransform = new SkewTransform(-40, 0)
+            };
 
             Name = roomData.name;
             ID = roomData.roomId;
@@ -37,21 +38,18 @@ namespace MMO_Client.Client.World.Rooms
 
             Size = new((double)roomData.size[0], (double)roomData.size[1]);
             CreateTiles(roomData.tiles);
+
+            CreateObjects(roomData.objects);
         }
 
         private void CreateTiles(dynamic tiles)
         {
-            tilesMatrix = new();
-            TilesGrid = new()
-            {
-                RenderTransform = new SkewTransform(-40, 0)
-            };
+            TilesMatrix = new();
 
-            Grid.Children.Add(TilesGrid);
-            TilesGrid.Margin = new Thickness(GameScreen.GameWidth / 3, 0, -GameScreen.GameWidth / 3, 0);
+            Canvas.Margin = new Thickness(GameScreen.GameWidth / 3, 0, -GameScreen.GameWidth / 3, 0);
 
             for (int i = 0; i < Size.Width; i++)
-                tilesMatrix[i] = new Dictionary<int, Tile>();
+                TilesMatrix[i] = new Dictionary<int, Tile>();
 
             foreach (var obj in tiles)
             {
@@ -59,8 +57,18 @@ namespace MMO_Client.Client.World.Rooms
                 int x = int.Parse(coords[0]);
                 int y = int.Parse(coords[1]);
 
-                Tile tile = new(x, y, (bool)obj.Value);
-                tilesMatrix[x][y] = tile;
+                Tile tile = new(new Coord(x, y), (bool)obj.Value);
+                TilesMatrix[x][y] = tile;
+            }
+        }
+
+        private void CreateObjects(dynamic objects)
+        {
+            foreach (var obj in objects)
+            {
+                Coord coord = new((int)obj.coord[0], (int)obj.coord[1]);
+                Size size = new((int)obj.size[0], (int)obj.size[1]);
+                new RoomObject((string)obj.id, (string)obj.name, coord, size,(int)obj.direction, (bool)obj.blockingHint);
             }
         }
     }
