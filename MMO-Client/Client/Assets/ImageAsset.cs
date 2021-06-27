@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using MMO_Client.Common;
 
@@ -9,9 +10,12 @@ namespace MMO_Client.Client.Assets
 {
     class ImageAsset : Asset
     {
-        public System.Windows.Controls.Image Image { get; init; }
+        public Image Image { get; init; }
         public BitmapImage InitialImage { get; private set; } = null;
         public BitmapImage LastDrawnImage { get; private set; } = null;
+
+        public double Width { get; private set; }
+        public double Height { get; private set; }
 
         public List<BitmapImage> Frames { get; private set; } = null;
         public int FPS { get; set; } = 24;
@@ -28,17 +32,27 @@ namespace MMO_Client.Client.Assets
             //RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.NearestNeighbor);
         }
 
-        public void Initialize(BitmapImage initialImage, List<BitmapImage> frames)
+        public void Initialize(BitmapImage initialImage, List<BitmapImage> frames, double width, double height)
         {
             InitialImage = initialImage;
             Frames = frames;
+
+            Image.Width = width;
+            Image.Height = height;
+            Width = width;
+            Height = height;
 
             Draw(initialImage);
         }
 
         public void LoadFrames(string directory)
         {
+            if (!Directory.Exists(directory))
+                goto error;
+
             int filesCount = Directory.GetFiles(directory).Length;
+            if (filesCount == 0)
+                goto error;
 
             InitialImage = new();
             InitialImage.BeginInit();
@@ -74,7 +88,28 @@ namespace MMO_Client.Client.Assets
                 Logger.Debug($"Loaded {Frames.Count} frames", ID);
             }
 
+            // Image Assets are exported with 300% zoom, so divide the size by 3
+            Image.Width = InitialImage.Width / 3;
+            Image.Height = InitialImage.Height / 3;
+            Width = Image.Width;
+            Height = Image.Height;
+
             Draw(InitialImage);
+            return;
+
+        error:
+            Logger.Error("Couldn't load image asset", ID);
+
+            BitmapImage errorImg = new();
+            errorImg.BeginInit();
+            errorImg.UriSource = new Uri($@"{AssetsManager.AssetsPath}\MMOClient\error.png", UriKind.RelativeOrAbsolute);
+            errorImg.CacheOption = BitmapCacheOption.OnLoad;
+            errorImg.EndInit();
+
+            Image.Width = errorImg.Width;
+            Image.Height = errorImg.Height;
+
+            Draw(errorImg);
         }
 
         public void Draw(BitmapImage image)

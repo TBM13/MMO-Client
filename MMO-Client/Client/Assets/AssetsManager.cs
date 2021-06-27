@@ -39,6 +39,7 @@ namespace MMO_Client.Client.Assets
                     if (v.IsFree)
                     {
                         Logger.Debug($"Recycling free image asset {ID}", title);
+
                         v.Recycle();
                         return v;
                     }
@@ -57,7 +58,7 @@ namespace MMO_Client.Client.Assets
             {
                 Logger.Debug($"Cloning image asset {ID}", title);
 
-                newAsset.Initialize(assetToClone.InitialImage, assetToClone.Frames);
+                newAsset.Initialize(assetToClone.InitialImage, assetToClone.Frames, assetToClone.Width, assetToClone.Height);
                 newAsset.FPS = assetToClone.FPS;
                 newAsset.Loop = assetToClone.Loop;
             }
@@ -84,7 +85,9 @@ namespace MMO_Client.Client.Assets
                 newAsset.LoadFrames(path);
             }
 
-            imagePool.Add(newAsset);
+            if (newAsset.InitialImage != null) // We don't want to add broken image assets to the pool
+                imagePool.Add(newAsset);
+
             return newAsset;
         }
 
