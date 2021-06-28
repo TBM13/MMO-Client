@@ -37,6 +37,7 @@ namespace MMO_Client.Client.World.Rooms
                 HorizontalAlignment = HorizontalAlignment.Left
             };
 
+            // Why do we need to decrease 42 and 21? I don't know
             Canvas.SetLeft(rectangle, Coord.X * Width - 42);
             Canvas.SetTop(rectangle, Coord.Y * Height - 21);
 

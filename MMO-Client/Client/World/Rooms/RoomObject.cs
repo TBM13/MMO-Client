@@ -51,7 +51,7 @@ namespace MMO_Client.Client.World.Rooms
             double xPos = Coord.X * Tile.Width;
             Canvas.SetLeft(imageAsset.Image, xPos);
 
-            double yPos = Coord.Y * Tile.Height - 6;
+            double yPos = Coord.Y * Tile.Height - 6; // Why do we need to decrease 6? I don't know
             Canvas.SetTop(imageAsset.Image, yPos);
 
             // Cancel the 3D perspective of the image
@@ -83,7 +83,7 @@ namespace MMO_Client.Client.World.Rooms
             }
             else
             {
-                xCorrection = ((double)properties.bounds[0] * GameScreen.SizeMultiplier) + (double)properties.bounds[1];
+                xCorrection = ((double)properties.bounds[0] * GameScreen.SizeMultiplier) + ((double)properties.bounds[1] * 1.07); // Where did the 1.07 come from? I don't know
                 yCorrection = ((double)properties.bounds[1] * GameScreen.SizeMultiplier);
 
                 // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
