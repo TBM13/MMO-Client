@@ -30,6 +30,11 @@ namespace MMO_Client.Screens
         public static double GameWidth { get => instance.canvas.Width; }
         public static double GameHeight { get => instance.canvas.Height; }
 
+        /// <summary>
+        /// The objects look too small in comparison to MG, so we have to multiply their size.
+        /// </summary>
+        public const double SizeMultiplier = 1.3;
+
         public GameScreen()
         {
             instance = this;

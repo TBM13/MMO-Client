@@ -7,6 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using MMO_Client.Client.Assets;
+using MMO_Client.Common;
+using MMO_Client.Screens;
 
 namespace MMO_Client.Client.World.Rooms
 {
@@ -20,6 +22,9 @@ namespace MMO_Client.Client.World.Rooms
         public int Direction { get; init; }
         public bool BlockingHint { get; init; }
 
+        private ImageAsset imageAsset;
+        private dynamic properties;
+
         public RoomObject(string id, string name, Coord coord, Size size, int direction, bool blockingHint)
         {
             ID = id;
@@ -29,28 +34,63 @@ namespace MMO_Client.Client.World.Rooms
             Direction = direction;
             BlockingHint = blockingHint;
 
-            ImageAsset imageAsset = AssetsManager.CreateImageAsset(Name);
+            LoadAsset();
+            LoadProperties();
+        }
 
-            // The objects looked too small in comparison to MG, so i had to multiply their size
-            // This value (1.3) is most likely not perfect, as i figured it with the naked eye
-            imageAsset.Image.Width *= 1.3;
-            imageAsset.Image.Height *= 1.3;
+        /// <summary>
+        /// Loads and adds the asset to the room.
+        /// </summary>
+        private void LoadAsset()
+        {
+            imageAsset = AssetsManager.CreateImageAsset(Name);
 
-            double xPos = Coord.X * Tile.Width + Tile.MarginX;
-            double widthCorrection = (imageAsset.Image.Width - Tile.Width / 1.5) / Size.Width;
-            double xCenterCorrection = Tile.Width / (imageAsset.Image.Width / 3);
-            double xImageCenterCorrection = imageAsset.Image.Width / 20;
+            imageAsset.Image.Width *= GameScreen.SizeMultiplier;
+            imageAsset.Image.Height *= GameScreen.SizeMultiplier;
 
-            Canvas.SetLeft(imageAsset.Image, xPos - widthCorrection);
+            double xPos = Coord.X * Tile.Width;
+            Canvas.SetLeft(imageAsset.Image, xPos);
 
-            double yPos = Coord.Y * Tile.Height + Tile.MarginY;
-            double heightCorrection = (imageAsset.Image.Height - Tile.Height) / Size.Height;
-            double yCenterCorrection = Tile.Height / (imageAsset.Image.Height / 3);
-            Canvas.SetTop(imageAsset.Image, yPos - heightCorrection);
+            double yPos = Coord.Y * Tile.Height - 6;
+            Canvas.SetTop(imageAsset.Image, yPos);
 
             // Cancel the 3D perspective of the image
             imageAsset.Image.RenderTransform = new SkewTransform(40, 0);
             Room.CurrentRoom.Canvas.Children.Add(imageAsset.Image);
+        }
+
+        /// <summary>
+        /// Loads and applies the asset properties.
+        /// </summary>
+        private void LoadProperties()
+        {
+            properties = AssetsManager.GetAssetProperties(Name);
+
+            double xCorrection;
+            double yCorrection;
+
+            if (properties == null)
+            {
+                Logger.Warn($"Object doesn't have any properties. Position in room may be inaccurate!", Name);
+
+                // Try an alternative method to position the object
+                // It's very inaccurate, but better than nothing
+                yCorrection = -(imageAsset.Image.Height - Tile.Height / 2);
+                xCorrection = -(imageAsset.Image.Width - Tile.Width / 1.5) + yCorrection;
+
+                xCorrection /= Size.Width;
+                yCorrection /= Size.Height;
+            }
+            else
+            {
+                xCorrection = ((double)properties.bounds[0] * GameScreen.SizeMultiplier) + (double)properties.bounds[1];
+                yCorrection = ((double)properties.bounds[1] * GameScreen.SizeMultiplier);
+
+                // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
+            }
+
+            Canvas.SetLeft(imageAsset.Image, Canvas.GetLeft(imageAsset.Image) + xCorrection);
+            Canvas.SetTop(imageAsset.Image,  Canvas.GetTop(imageAsset.Image)  + yCorrection);
         }
     }
 }

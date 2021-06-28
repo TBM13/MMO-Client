@@ -26,15 +26,19 @@ namespace MMO_Client.Client.World.Rooms
         public Room(dynamic roomData)
         {
             CurrentRoom = this;
+
+            Name = roomData.name;
+            ID = roomData.roomId;
+            Logger.Debug($"Creating Room {ID}", Name);
+
             Canvas = new()
             {
                 RenderTransform = new SkewTransform(-40, 0)
             };
 
-            Name = roomData.name;
-            ID = roomData.roomId;
-
-            Logger.Debug($"Creating Room {ID}", Name);
+            // Apply Margin
+            Canvas.SetLeft(Canvas, -190);
+            Canvas.SetTop(Canvas, 287);
 
             Size = new((double)roomData.size[0], (double)roomData.size[1]);
             CreateTiles(roomData.tiles);
