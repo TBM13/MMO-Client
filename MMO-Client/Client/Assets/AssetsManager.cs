@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Windows.Markup;
 using System.Windows.Media;
+using Newtonsoft.Json.Linq;
 using MMO_Client.Common;
 
 namespace MMO_Client.Client.Assets
@@ -208,6 +209,21 @@ namespace MMO_Client.Client.Assets
             decompressionStream.CopyTo(decompressedFileStream);
 
             return true;
+        }
+
+        public static dynamic GetAssetProperties(string ID)
+        {
+            string path = AssetsPath;
+            string[] splittedID = ID.Split(".");
+            for (int i = 0; i < splittedID.Length - 1; i++)
+                path += $@"\{splittedID[i]}";
+
+            path += $@"\{splittedID[^1]}.json";
+
+            if (!File.Exists(path))
+                return null;
+
+            return JObject.Parse(File.ReadAllText(path));
         }
 
         public static VectorAsset CreateVectorAsset(string ID) => 
