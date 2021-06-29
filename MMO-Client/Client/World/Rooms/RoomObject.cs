@@ -45,9 +45,6 @@ namespace MMO_Client.Client.World.Rooms
         {
             imageAsset = AssetsManager.CreateImageAsset(Name);
 
-            imageAsset.Image.Width *= GameScreen.SizeMultiplier;
-            imageAsset.Image.Height *= GameScreen.SizeMultiplier;
-
             double xPos = Coord.X * Tile.Width;
             Canvas.SetLeft(imageAsset.Image, xPos);
 
@@ -91,6 +88,26 @@ namespace MMO_Client.Client.World.Rooms
 
             Canvas.SetLeft(imageAsset.Image, Canvas.GetLeft(imageAsset.Image) + xCorrection);
             Canvas.SetTop(imageAsset.Image,  Canvas.GetTop(imageAsset.Image)  + yCorrection);
+
+            DrawAsset();
+        }
+
+        private void DrawAsset()
+        {
+            Dictionary<string, int> animations = null;
+
+            if (properties.animations != null)
+            {
+                animations = new();
+                foreach(var obj in properties.animations)
+                    animations.Add((string)obj.Name, (int)obj.Value);
+            }
+
+            imageAsset.LoadAllFrames(animations);
+            imageAsset.DrawFrame(1);
+
+            imageAsset.Image.Width *= GameScreen.SizeMultiplier;
+            imageAsset.Image.Height *= GameScreen.SizeMultiplier;
         }
     }
 }

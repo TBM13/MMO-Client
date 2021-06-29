@@ -176,9 +176,6 @@ namespace MMO_Client.Client.Assets
         /// <param name="name">Name of the animation. If the asset doesn't contain any animation names, set this to an empty string.</param>
         public async void PlayAnimation(string name, bool loop)
         {
-            if (IsBroken)
-                return;
-
             Loop = loop;
 
             if (PlayingAnimation)
