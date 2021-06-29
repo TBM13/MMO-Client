@@ -10,17 +10,16 @@ namespace MMO_Client.Client.Assets
 {
     class ImageAsset : Asset
     {
+        public static BitmapImage ErrorBitmapImage { get; set; }
+
         public Image Image { get; init; }
-        public BitmapImage InitialImage { get; private set; } = null;
-        public BitmapImage LastDrawnImage { get; private set; } = null;
 
-        public double Width { get; private set; }
-        public double Height { get; private set; }
-
-        public List<BitmapImage> Frames { get; private set; } = null;
-        public int FPS { get; set; } = 24;
+        public Dictionary<string, List<BitmapImage>> Frames { get; private set; } = null;
+        public int Framerate { get; set; } = 24;
         public bool Loop { get; set; }
         public bool PlayingAnimation { get; private set; }
+
+        public bool IsBroken { get; private set; }
 
         public ImageAsset()
         {
@@ -32,46 +31,39 @@ namespace MMO_Client.Client.Assets
             //RenderOptions.SetBitmapScalingMode(Image, BitmapScalingMode.NearestNeighbor);
         }
 
-        public void Initialize(BitmapImage initialImage, List<BitmapImage> frames, double width, double height)
+        public void Clone(ImageAsset assetToClone)
         {
-            InitialImage = initialImage;
-            Frames = frames;
+            Frames = assetToClone.Frames;
 
-            Image.Width = width;
-            Image.Height = height;
-            Width = width;
-            Height = height;
-
-            Draw(initialImage);
+            Framerate = assetToClone.Framerate;
+            Loop = assetToClone.Loop;
         }
 
-        public void LoadFrames(string directory)
+        public void LoadAllFrames(Dictionary<string, int> animations = null)
         {
-            if (!Directory.Exists(directory))
+            if (Frames != null)
+                return;
+
+            string path = AssetsManager.GetAssetPath(ID);
+            if (path == null)
                 goto error;
 
-            int filesCount = Directory.GetFiles(directory).Length;
-            if (filesCount == 0)
+            int framesCount = Directory.GetFiles(path).Length;
+            if (framesCount == 0)
                 goto error;
 
-            InitialImage = new();
-            InitialImage.BeginInit();
-            InitialImage.UriSource = new Uri($@"{directory}\1.png", UriKind.RelativeOrAbsolute);
-            InitialImage.CacheOption = BitmapCacheOption.OnLoad;
-            InitialImage.EndInit();
-
-            if (filesCount > 1)
+            Frames = new();
+            if (animations == null)
             {
-                Frames = new();
-                Frames.Add(InitialImage);
+                List<BitmapImage> list = new();
 
-                for (int i = 1; i < filesCount; i++)
+                for (int i = 1; i <= framesCount; i++)
                 {
-                    using StreamReader stream = new($@"{directory}\{i}.png");
+                    using StreamReader stream = new($@"{path}\{i}.png");
                     if (stream.BaseStream.Length <= 4)  // This means the file is referencing another frame
                     {
                         int frameToCopy = int.Parse(stream.ReadLine());
-                        Frames.Add(Frames[frameToCopy - 1]);
+                        list.Add(list[frameToCopy - 1]);
                     }
                     else
                     {
@@ -81,45 +73,112 @@ namespace MMO_Client.Client.Assets
                         frame.CacheOption = BitmapCacheOption.OnLoad;
                         frame.EndInit();
 
-                        Frames.Add(frame);
+                        list.Add(frame);
                     }
                 }
 
-                Logger.Debug($"Loaded {Frames.Count} frames", ID);
+                Frames[""] = list;
+            }
+            else
+            {
+                int pairIndex = 0;
+                foreach(KeyValuePair<string, int> pair in animations)
+                {
+                    List<BitmapImage> list = new();
+                    int i;
+
+                    bool shouldAddNextFrame()
+                    {
+                        if (i > framesCount)
+                            return false;
+
+                        foreach (KeyValuePair<string, int> p in animations)
+                        {
+                            if (p.Key != pair.Key && i >= p.Value)
+                                return false;
+                        }
+
+                        return true;
+                    }
+
+                    for (i = pair.Value; shouldAddNextFrame(); i++)
+                    {
+                        using StreamReader stream = new($@"{path}\{i}.png");
+                        if (stream.BaseStream.Length <= 4)  // This means the file is referencing another frame
+                        {
+                            int frameToCopy = int.Parse(stream.ReadLine());
+                            list.Add(list[frameToCopy - 1]);
+                        }
+                        else
+                        {
+                            BitmapImage frame = new();
+                            frame.BeginInit();
+                            frame.StreamSource = stream.BaseStream;
+                            frame.CacheOption = BitmapCacheOption.OnLoad;
+                            frame.EndInit();
+
+                            list.Add(frame);
+                        }
+                    }
+
+                    Frames[pair.Key] = list;
+                    pairIndex++;
+                }
             }
 
-            // Image Assets are exported with 300% zoom, so divide the size by 3
-            Image.Width = InitialImage.Width / 3;
-            Image.Height = InitialImage.Height / 3;
-            Width = Image.Width;
-            Height = Image.Height;
-
-            Draw(InitialImage);
             return;
 
         error:
+            IsBroken = true;
             Logger.Error("Couldn't load image asset", ID);
 
-            BitmapImage errorImg = new();
-            errorImg.BeginInit();
-            errorImg.UriSource = new Uri($@"{AssetsManager.AssetsPath}\MMOClient\error.png", UriKind.RelativeOrAbsolute);
-            errorImg.CacheOption = BitmapCacheOption.OnLoad;
-            errorImg.EndInit();
-
-            Image.Width = errorImg.Width;
-            Image.Height = errorImg.Height;
-
-            Draw(errorImg);
+            Image.Width = ErrorBitmapImage.Width;
+            Image.Height = ErrorBitmapImage.Height;
+            Draw(ErrorBitmapImage);
         }
 
-        public void Draw(BitmapImage image)
+        public void DrawFrame(int frame)
+        {
+            if (Frames == null)
+                return;
+
+            int i = 1;
+            foreach (KeyValuePair<string, List<BitmapImage>> pair in Frames)
+            {
+                for (int j = 0; j < pair.Value.Count; j++)
+                {
+                    if (i == frame)
+                    {
+                        if (Image.Source == null)
+                        {
+                            // Image Assets are exported with 300% zoom, so divide the size by 3
+                            Image.Width = pair.Value[j].Width / 3;
+                            Image.Height = pair.Value[j].Height / 3;
+                        }
+
+                        Draw(pair.Value[j]);
+                        return;
+                    }
+
+                    i++;
+                }
+            }
+
+            Logger.Error($"Invalid Frame {frame}", ID);
+            Draw(ErrorBitmapImage);
+        }
+
+        private void Draw(BitmapImage image)
         {
             Image.Source = image;
-            LastDrawnImage = image;
         }
 
-        public async void StartAnimation(bool loop)
+        /// <param name="name">Name of the animation. If the asset doesn't contain any animation names, set this to an empty string.</param>
+        public async void PlayAnimation(string name, bool loop)
         {
+            if (IsBroken)
+                return;
+
             Loop = loop;
 
             if (PlayingAnimation)
@@ -130,20 +189,27 @@ namespace MMO_Client.Client.Assets
 
             if (Frames == null)
             {
-                Logger.Warn("No animation frames loaded", ID);
+                Logger.Error("No animation frames loaded", ID);
+                return;
+            }
+
+            if (!Frames.ContainsKey(name) || Frames[name].Count <= 1)
+            {
+                Logger.Error($"Animation {name} doesn't contain any frames or only contains one", ID);
                 return;
             }
 
             PlayingAnimation = true;
 
-            int delayTime = 1000 / FPS;
+            List<BitmapImage> frames = Frames[name];
 
+            int delayTime = 1000 / Framerate;
             int frame = 0;
             while (PlayingAnimation)
             {
                 await Task.Delay(delayTime);
                 frame++;
-                if (frame == Frames.Count)
+                if (frame == frames.Count)
                 {
                     if (Loop)
                         frame = 0;
@@ -154,20 +220,12 @@ namespace MMO_Client.Client.Assets
                     }
                 }
 
-                Draw(Frames[frame]);
+                Draw(frames[frame]);
             }
         }
 
         public void StopAnimation() =>
             PlayingAnimation = false;
-
-        public void Recycle()
-        {
-            IsFree = false;
-
-            if (LastDrawnImage != InitialImage)
-                Draw(InitialImage);
-        }
 
         public override void Free()
         {

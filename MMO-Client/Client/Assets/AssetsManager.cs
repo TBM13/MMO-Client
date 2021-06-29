@@ -5,6 +5,8 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using Newtonsoft.Json.Linq;
 using MMO_Client.Common;
+using System.Windows.Media.Imaging;
+using System;
 
 namespace MMO_Client.Client.Assets
 {
@@ -27,71 +29,105 @@ namespace MMO_Client.Client.Assets
                 Logger.Warn("Assets folder didn't exist, so we created it", title);
             }
 
+            BitmapImage errorImg = new();
+            errorImg.BeginInit();
+            errorImg.UriSource = new Uri($@"{AssetsPath}\MMOClient\error.png", UriKind.RelativeOrAbsolute);
+            errorImg.CacheOption = BitmapCacheOption.OnLoad;
+            errorImg.EndInit();
+            ImageAsset.ErrorBitmapImage = errorImg;
+
             Logger.Info("Assets Manager Created", title);
         }
 
+        public static string GetAssetPath(string ID)
+        {
+            string path = AssetsPath;
+
+            string[] splittedID = ID.Split(".");
+            for (int i = 0; i < splittedID.Length; i++)
+                path += $@"\{splittedID[i]}";
+
+            if (!Directory.Exists(path))
+                return null;
+
+            return path;
+        }
+
+        public static dynamic GetAssetProperties(string ID)
+        {
+            string path = AssetsPath;
+            string[] splittedID = ID.Split(".");
+            for (int i = 0; i < splittedID.Length - 1; i++)
+                path += $@"\{splittedID[i]}";
+
+            path += $@"\{splittedID[^1]}.json";
+
+            if (!File.Exists(path))
+                return null;
+
+            return JObject.Parse(File.ReadAllText(path));
+        }
+
+        #region Image Asset
         private ImageAsset GetOrCreateImageAsset(string ID)
         {
             ImageAsset assetToClone = null;
-            foreach (ImageAsset v in imagePool)
+            for (int i = 0; i < imagePool.Count; i++)
             {
-                if (v.ID == ID)
+                ImageAsset asset = imagePool[i];
+
+                if (asset.IsBroken)
                 {
-                    if (v.IsFree)
+                    Logger.Debug($"Removing broken image asset {ID} from pool", title);
+                    imagePool.RemoveAt(i);
+
+                    i--;
+                    continue;
+                }
+
+                if (asset.ID == ID)
+                {
+                    if (asset.IsFree)
                     {
                         Logger.Debug($"Recycling free image asset {ID}", title);
 
-                        v.Recycle();
-                        return v;
+                        asset.Unfree();
+                        return asset;
                     }
 
-                    assetToClone = v;
+                    assetToClone = asset;
                 }
             }
 
-            ImageAsset newAsset = new()
-            {
-                IsFree = false,
-                ID = ID
-            };
+            ImageAsset newAsset = new() { ID = ID };
 
             if (assetToClone != null)
             {
                 Logger.Debug($"Cloning image asset {ID}", title);
 
-                newAsset.Initialize(assetToClone.InitialImage, assetToClone.Frames, assetToClone.Width, assetToClone.Height);
-                newAsset.FPS = assetToClone.FPS;
-                newAsset.Loop = assetToClone.Loop;
+                newAsset.Clone(assetToClone);
             }
             else
             {
                 Logger.Debug($"Creating image asset {ID}", title);
 
-                string path = AssetsPath;
-                string[] splittedID = ID.Split(".");
-                for (int i = 0; i < splittedID.Length; i++)
+                string path = GetAssetPath(ID);
+                if (path == null)
                 {
-                    path += $@"\{splittedID[i]}";
-
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                        if (i == splittedID.Length - 1)
-                        {
-                            // TODO: Request image asset to server
-                        }
-                    }
+                    Directory.CreateDirectory(path);
+                    // TODO: Download image asset from server
                 }
-
-                newAsset.LoadFrames(path);
             }
 
-            if (newAsset.InitialImage != null) // We don't want to add broken image assets to the pool
-                imagePool.Add(newAsset);
-
+            imagePool.Add(newAsset);
             return newAsset;
         }
 
+        public static ImageAsset CreateImageAsset(string ID) =>
+            instance.GetOrCreateImageAsset(ID);
+        #endregion
+
+        #region Vector Asset
         private VectorAsset GetOrCreateVectorAsset(string ID)
         {
             VectorAsset assetToClone = null;
@@ -102,6 +138,7 @@ namespace MMO_Client.Client.Assets
                     if (v.IsFree)
                     {
                         Logger.Debug($"Recycling free vector asset {ID}", title);
+
                         v.Recycle();
                         return v;
                     }
@@ -110,11 +147,7 @@ namespace MMO_Client.Client.Assets
                 }
             }
 
-            VectorAsset newAsset = new()
-            {
-                IsFree = false,
-                ID = ID
-            };
+            VectorAsset newAsset = new() { ID = ID };
 
             if (assetToClone != null)
             {
@@ -211,25 +244,8 @@ namespace MMO_Client.Client.Assets
             return true;
         }
 
-        public static dynamic GetAssetProperties(string ID)
-        {
-            string path = AssetsPath;
-            string[] splittedID = ID.Split(".");
-            for (int i = 0; i < splittedID.Length - 1; i++)
-                path += $@"\{splittedID[i]}";
-
-            path += $@"\{splittedID[^1]}.json";
-
-            if (!File.Exists(path))
-                return null;
-
-            return JObject.Parse(File.ReadAllText(path));
-        }
-
-        public static VectorAsset CreateVectorAsset(string ID) => 
+        public static VectorAsset CreateVectorAsset(string ID) =>
             instance.GetOrCreateVectorAsset(ID);
-
-        public static ImageAsset CreateImageAsset(string ID) =>
-            instance.GetOrCreateImageAsset(ID);
+        #endregion
     }
 }
