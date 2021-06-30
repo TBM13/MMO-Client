@@ -1,24 +1,25 @@
 ﻿#define MinesDebug
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using MMO_Client.Common;
 using MMO_Client.Client.Net.Mines.Mobjects;
 using MMO_Client.Client.Net.Mines.IO;
+using MMO_Client.Client.Net.Mines.Event;
 
 namespace MMO_Client.Client.Net.Mines
 {
     class MinesManager
     {
         public static MinesManager Instance;
-        private const string title = "Mines Manager";
 
+        public delegate void Mines1Event(MinesEvent arg1);
+        public Mines1Event OnLogin;
+        public Mines1Event OnLogout;
+        public Mines1Event OnMessage;
+
+        private const string title = "Mines Manager";
         private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
 
         public MinesManager()
@@ -124,14 +125,54 @@ namespace MMO_Client.Client.Net.Mines
                 HandleSocketData(buffer);
             }
             else
-                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", title);
+                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", title, true);
         }
 
         private void HandleSocketData(byte[] data)
         {
-            for (int i = 0; i < data.Length; i++)
-            {
+            ByteArray byteArray = new();
+            byteArray.WriteBytes(data, 0, data.Length);
 
+            int header = byteArray.ReadByte();
+            if (header != Message.HEADER_TYPE)
+            {
+                Logger.Error($"Unknown Header {(char)header} [{header}]", title, true);
+                return;
+            }
+
+            Message msg = new();
+            msg.SetPayload(byteArray.ReadInt());
+
+            msg.Read(byteArray);
+
+            if (msg.IsComplete())
+                ProcessMessage(msg);
+            else
+                Logger.Error("Message isn't complete!!!", title, true);
+        }
+
+        private void ProcessMessage(Message msg)
+        {
+            Mobject mObj = msg.ToMobject();
+
+            switch(mObj.Strings["type"])
+            {
+                case "ping":
+                    break;
+                case "data":
+                    OnMessage?.Invoke(new MinesEvent(true, null, mObj.Mobjects["mobject"]));
+                    break;
+                case "login":
+                    OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
+                    Logger.Debug("Login!!!", title, true);
+                    break;
+                case "logout":
+                    OnLogout?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
+                    Logger.Debug("Logout!!!", title, true);
+                    break;
+                default:
+                    Logger.Error($"Unknown Message Type \"{mObj.Strings["type"]}\"", title, true);
+                    break;
             }
         }
     }

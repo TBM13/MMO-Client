@@ -10,6 +10,7 @@ using MMO_Client.Screens;
 using MMO_Client.Client.Assets;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.Net.Mines.Mobjects;
+using MMO_Client.Client.Net.Mines.Event;
 
 namespace MMO_Client
 {
@@ -35,7 +36,7 @@ namespace MMO_Client
 
             Mobject mobj = new();
             mobj.Strings["size"] = "5370132";
-            mobj.Strings["hash"] = "VGC1jKXQ8axqoM4nY9k2owjm4ZHhgeIHHr42h1Q51nd3kzJ26TWVl054B23c5n6C";
+            mobj.Strings["hash"] = "V8euWoGRbNXaDR1qFK9jIxf4L6618wOUS1aDqUY6ZvYYs283io6fPvj73q8z4h16";
             mobj.Strings["type"] = "login";
             mobj.Strings["check"] = "haha";
             mobj.Strings["username"] = "TEST001";

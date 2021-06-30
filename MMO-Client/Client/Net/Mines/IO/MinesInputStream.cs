@@ -85,7 +85,7 @@ namespace MMO_Client.Client.Net.Mines.IO
                     break;
 
                 default:
-                    Logger.Fatal($"Invalid MobjectData header while reading: {dataType} [{(byte)dataType}]", "Mines Input Stream");
+                    Logger.Error($"Invalid MobjectData header while reading: {dataType} [{(byte)dataType}]", "Mines Input Stream", true);
                     break;
             }
 

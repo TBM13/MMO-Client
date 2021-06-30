@@ -91,7 +91,7 @@ namespace MMO_Client.Client.Net.Mines.Mobjects
                     MobjectArrays[mData.Key] = (Mobject[])mData.Value;
                     break;
                 default:
-                    Logger.Fatal($"Unable to add data! Unknown DataType {mData.DataType}", "Mobject");
+                    Logger.Error($"Unable to add data! Unknown DataType {mData.DataType}", "Mobject", true);
                     break;
             }
         }

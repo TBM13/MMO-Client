@@ -6,8 +6,10 @@ namespace MMO_Client.Client.Net.Mines.IO
 {
     class ByteArray
     {
-        public List<byte> Bytes { get; private set; } = new();
+        public List<byte> Bytes { get; } = new();
         public int ReadPosition { get; set; } = 0;
+
+        public ByteArray() { }
 
         public void WriteByte(byte b) =>
             Bytes.Add(b);
@@ -18,13 +20,13 @@ namespace MMO_Client.Client.Net.Mines.IO
             return Bytes[ReadPosition - 1];
         }
 
-        public void WriteBytes(byte[] bytes, int offset = 0, int length = 0)
+        public void WriteBytes(byte[] bytes, int offset, int length)
         {
             for (int i = offset; i < length; i++)
                 WriteByte(bytes[i]);
         }
 
-        public void WriteBytes(List<byte> bytes, int offset = 0, int length = 0)
+        public void WriteBytes(List<byte> bytes, int offset, int length)
         {
             for (int i = offset; i < length; i++)
                 WriteByte(bytes[i]);
