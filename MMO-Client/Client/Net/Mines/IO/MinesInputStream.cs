@@ -1,74 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MMO_Client.Client.Net.Mines.Mobjects;
+﻿using MMO_Client.Client.Net.Mines.Mobjects;
 using MMO_Client.Common;
 
 namespace MMO_Client.Client.Net.Mines.IO
 {
-    class MinesInputStream
+    class MinesInputStream : ByteArray
     {
-        public byte[] Bytes { get; private set; }
-        public int Position { get; private set; } = 0;
-
-        public MinesInputStream(byte[] bytes) => 
-            Bytes = bytes;
-
-        public byte ReadByte()
-        {
-            Position++;
-            return Bytes[Position - 1];
-        }
-
-        public List<byte> ReadBytes(int length)
-        {
-            List<byte> result = new();
-
-            for (int i = 0; i < length; i++)
-                result.Add(ReadByte());
-
-            return result;
-        }
-
-        public int ReadInt()
-        {
-            byte[] bytes = new byte[4];
-            for (int i = 0; i < bytes.Length; i++)
-                bytes[i] = ReadByte();
-
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(bytes);
-
-            return BitConverter.ToInt32(bytes, 0);
-        }
-
-        public float ReadFloat()
-        {
-            byte[] bytes = new byte[4];
-            for (int i = 0; i < bytes.Length; i++)
-                bytes[i] = ReadByte();
-
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(bytes);
-
-            return BitConverter.ToSingle(bytes, 0);
-        }
-
-        public string ReadString()
-        {
-            int length = ReadInt();
-            string result = Encoding.ASCII.GetString(Bytes, Position, length);
-
-            Position += length;
-            return result;
-        }
-
-        public bool ReadBoolean()
-        {
-            byte b = ReadByte();
-
-            return b == 1;
-        }
+        public MinesInputStream() { }
 
         public MobjectData ReadMobjectData()
         {
@@ -167,6 +104,6 @@ namespace MMO_Client.Client.Net.Mines.IO
         }
 
         public void DiscardHeader() =>
-            Position++;
+            ReadPosition++;
     }
 }

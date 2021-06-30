@@ -21,9 +21,6 @@ namespace MMO_Client.Client.Net.Mines
 
         private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
 
-        private static ManualResetEvent sendDone = new(false);
-        private static ManualResetEvent receiveDone = new(false);
-
         public MinesManager()
         {
             Instance = this;
@@ -31,6 +28,10 @@ namespace MMO_Client.Client.Net.Mines
             Logger.Info("Mines Manager Created", title);
         }
 
+        /// <summary>
+        /// Connects the socket to the specified host and starts the read loop if the connection was successful.
+        /// </summary>
+        /// <returns>Returns true if the connection was successful.</returns>
         public bool Connect(string host, int port)
         {
             try
@@ -38,7 +39,13 @@ namespace MMO_Client.Client.Net.Mines
                 Logger.Info($"Connecting to {host}:{port}", title);
                 socket.Connect(host, port);
 
-                return socket.Connected;
+                if (socket.Connected)
+                {
+                    ReadLoop();
+                    return true;
+                }
+
+                return false;
             }
             catch (Exception e)
             {
@@ -48,6 +55,9 @@ namespace MMO_Client.Client.Net.Mines
             }
         }
 
+        /// <summary>
+        /// Converts the Mobject to a byte array and sends it.
+        /// </summary>
         public void Send(Mobject mobj)
         {
             MinesOutputStream mos = new();
@@ -67,26 +77,62 @@ namespace MMO_Client.Client.Net.Mines
 #endif
 
             byte[] bytesToSend = new byte[mos.Bytes.Count + 5];
-            bytesToSend[0] = 3;
+            bytesToSend[0] = Message.HEADER_TYPE; // Write header type
 
             byte[] lengthBytes = BitConverter.GetBytes(mos.Bytes.Count);
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(lengthBytes, 0, lengthBytes.Length);
 
-            for (int i = 0; i < lengthBytes.Length; i++)
+            for (int i = 0; i < lengthBytes.Length; i++) // Write mos length
                 bytesToSend[i + 1] = lengthBytes[i];
 
-            for (int i = 5; i < bytesToSend.Length; i++)
+            for (int i = 5; i < bytesToSend.Length; i++) // Write mos bytes
                 bytesToSend[i] = mos.Bytes[i - 5];
 
-            byte[] receiveBuffer = new byte[256000]; //256 KB
-            int bytesSent = socket.Send(bytesToSend);
-            int bytesRec = socket.Receive(receiveBuffer);
+            socket.BeginSend(bytesToSend, 0, bytesToSend.Length, 0, new AsyncCallback(SendCallback), null);
+        }
 
-            Logger.Debug($"Got {bytesRec} bytes", title);
+        private void SendCallback(IAsyncResult ar) => 
+            socket.EndSend(ar);
 
-            MinesInputStream mis = new(receiveBuffer);
-            Logger.Debug(mis.ReadMobject().ToString(), title);
+        /// <summary>
+        /// Continually checks if there is available data for reading, and reads it.
+        /// </summary>
+        private async void ReadLoop()
+        {
+            while (true)
+            {
+                if (socket.Available > 0)
+                {
+                    byte[] buffer = new byte[socket.Available];
+                    socket.BeginReceive(buffer, 0, socket.Available, 0, new AsyncCallback(ReceiveCallback), buffer);
+                }
+
+                await Task.Delay(5);
+            }
+        }
+
+        private void ReceiveCallback(IAsyncResult ar)
+        {
+            int bytesRead = socket.EndReceive(ar);
+
+            if (bytesRead > 0)
+            {
+                Logger.Debug($"{bytesRead} bytes read", title);
+
+                byte[] buffer = (byte[])ar.AsyncState;
+                HandleSocketData(buffer);
+            }
+            else
+                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", title);
+        }
+
+        private void HandleSocketData(byte[] data)
+        {
+            for (int i = 0; i < data.Length; i++)
+            {
+
+            }
         }
     }
 }

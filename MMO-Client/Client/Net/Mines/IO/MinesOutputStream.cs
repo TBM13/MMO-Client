@@ -1,65 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using MMO_Client.Client.Net.Mines.Mobjects;
+﻿using MMO_Client.Client.Net.Mines.Mobjects;
 using MMO_Client.Common;
 
 namespace MMO_Client.Client.Net.Mines.IO
 {
-    class MinesOutputStream
+    class MinesOutputStream : ByteArray
     {
         public const int HEADER_TYPE_PING = 1;
 		public const int HEADER_TYPE_LOGIN = 2;
 		public const int HEADER_TYPE_MOBJECT = 3;
 
-        public List<byte> Bytes { get; private set; } = new();
-
         public MinesOutputStream() { }
-
-        public void WriteByte(byte b) =>
-            Bytes.Add(b);
-
-        public void WriteBytes(byte[] bytes, int offset = 0, int length = 0)
-        {
-            for (int i = offset; i < length; i++)
-                WriteByte(bytes[i]);
-        }
-
-        public void WriteBytes(List<byte> bytes, int offset = 0, int length = 0)
-        {
-            for (int i = offset; i < length; i++)
-                WriteByte(bytes[i]);
-        }
-
-        public void WriteInt(int i)
-        {
-            byte[] b = BitConverter.GetBytes(i);
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(b, 0, b.Length);
-
-            WriteBytes(b, 0, b.Length);
-        }
-
-        public void WriteBoolean(bool b) =>
-            WriteByte((byte)(b ? 1 : 0));
-
-        public void WriteFloat(float f)
-        {
-            byte[] b = BitConverter.GetBytes(f);
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(b, 0, b.Length);
-
-            for (int i = 0; i < b.Length; i++)
-                WriteByte(b[i]);
-        }
-
-        public void WriteString(string s)
-        {
-            byte[] b = Encoding.ASCII.GetBytes(s);
-
-            WriteInt(b.Length);
-            WriteBytes(b, 0, b.Length);
-        }
 
         public void WritePing(string s)
         {
