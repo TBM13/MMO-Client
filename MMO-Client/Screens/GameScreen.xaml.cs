@@ -20,6 +20,8 @@ using MMO_Client.Client.Assets;
 using MMO_Client.Client.Assets.Controls;
 using MMO_Client.Client.World.Rooms;
 using Newtonsoft.Json.Linq;
+using MMO_Client.Client.Net.Mines.Event;
+using MMO_Client.Client.Net.Mines;
 
 namespace MMO_Client.Screens
 {
@@ -39,38 +41,7 @@ namespace MMO_Client.Screens
         {
             instance = this;
             InitializeComponent();
-
-            /*List<string> content = new();
-            for (int i = 1; i < 664; i++)
-            {
-                using StreamReader stream = new($@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC\{i}.png");
-                string c = stream.ReadToEnd();
-
-                bool reused = false;
-                for (int j = 0; j < content.Count; j++)
-                {
-                    if (content[j] == c)
-                    {
-                        reused = true;
-                        stream.Close();
-                        content.Add("asd");
-                        File.WriteAllText($@"E:\Usuario SSD\Nueva carpeta (6)\sprites\DefineSprite_2430_assets.MonkeyMC_assets.MonkeyMC\{i}.png", $"{j + 1}");
-                        break;
-                    }
-                }
-
-                if (reused) continue;
-
-                content.Add(c);
-            }*/
-
-
-
-            Room room = new(JObject.Parse(File.ReadAllText(@"E:\Usuario SSD\Nueva carpeta (6)\ROSEDAL2.json")));
-            canvas.Children.Add(room.Canvas);
-
-            /*ImageAsset asset = AssetsManager.CreateImageAsset("test.monoPng300");
-            canvas.Children.Add(asset.Image);*/
+            Show();
         }
     }
 }

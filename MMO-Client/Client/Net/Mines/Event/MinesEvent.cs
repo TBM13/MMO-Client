@@ -2,7 +2,7 @@
 
 namespace MMO_Client.Client.Net.Mines.Event
 {
-    class MinesEvent
+    internal class MinesEvent
     {
         public bool Success { get; init; }
         public string ErrorCode { get; init; }

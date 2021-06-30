@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="GameScreen" Height="1000" Width="960">
+        Title="GameScreen" Height="835.656" Width="1038">
     <Viewbox>
         <Canvas x:Name="canvas" Background="Gold" Height="835.656" Width="1038"/>
     </Viewbox>

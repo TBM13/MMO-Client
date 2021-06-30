@@ -1,9 +1,12 @@
-﻿namespace MMO_Client.Common
+﻿using MMO_Client.Client.Net.Mines.Event;
+
+namespace MMO_Client.Common
 {
-    public class Events
+    internal class Events
     {
-        public delegate void String2Event(string arg1, string arg2);
-        public delegate void String1Event(string arg1);
-        public delegate void Event();
+        internal delegate void Event();
+        internal delegate void String2Event(string arg1, string arg2);
+        internal delegate void String1Event(string arg1);
+        internal delegate void Mines1Event(MinesEvent arg1);
     }
 }

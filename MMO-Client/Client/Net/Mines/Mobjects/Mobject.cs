@@ -3,7 +3,7 @@ using MMO_Client.Common;
 
 namespace MMO_Client.Client.Net.Mines.Mobjects
 {
-    class Mobject
+    internal class Mobject
     {
         public Dictionary<string, int> Integers { get; private set; } = new();
         public Dictionary<string, float> Floats { get; private set; } = new();

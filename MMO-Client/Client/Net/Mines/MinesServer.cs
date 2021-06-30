@@ -1,6 +1,4 @@
-﻿#define MinesDebug
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using MMO_Client.Common;
@@ -10,30 +8,22 @@ using MMO_Client.Client.Net.Mines.Event;
 
 namespace MMO_Client.Client.Net.Mines
 {
-    class MinesManager
+    class MinesServer
     {
-        public static MinesManager Instance;
+        public Events.Mines1Event OnConnect;
+        public Events.Mines1Event OnLogin;
+        public Events.Mines1Event OnLogout;
+        public Events.Mines1Event OnMessage;
 
-        public delegate void Mines1Event(MinesEvent arg1);
-        public Mines1Event OnLogin;
-        public Mines1Event OnLogout;
-        public Mines1Event OnMessage;
-
-        private const string title = "Mines Manager";
+        private const string title = "Mines";
         private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
 
-        public MinesManager()
-        {
-            Instance = this;
-
-            Logger.Info("Mines Manager Created", title);
-        }
+        public MinesServer() { }
 
         /// <summary>
         /// Connects the socket to the specified host and starts the read loop if the connection was successful.
         /// </summary>
-        /// <returns>Returns true if the connection was successful.</returns>
-        public bool Connect(string host, int port)
+        public void Connect(string host, int port)
         {
             try
             {
@@ -42,17 +32,20 @@ namespace MMO_Client.Client.Net.Mines
 
                 if (socket.Connected)
                 {
+                    OnConnect?.Invoke(new MinesEvent(true, null, null));
+
                     ReadLoop();
-                    return true;
+                    return;
                 }
 
-                return false;
+                OnConnect?.Invoke(new MinesEvent(false, "0", null));
             }
             catch (Exception e)
             {
                 Logger.Error($"Error while connecting to {host}:{port}", title);
                 Logger.Error(e.ToString(), title);
-                return false;
+
+                OnConnect?.Invoke(new MinesEvent(false, "0", null));
             }
         }
 
@@ -64,7 +57,7 @@ namespace MMO_Client.Client.Net.Mines
             MinesOutputStream mos = new();
             mos.WriteMobject(mobj);
 
-#if MinesDebug
+#if NetworkDebug
             string result = "";
             byte[] b = new byte[mos.Bytes.Count];
             for (int i = 0; i < mos.Bytes.Count; i++)
@@ -160,7 +153,17 @@ namespace MMO_Client.Client.Net.Mines
                 case "ping":
                     break;
                 case "data":
-                    OnMessage?.Invoke(new MinesEvent(true, null, mObj.Mobjects["mobject"]));
+                    bool success = true;
+                    string errorCode = "<empty>";
+
+                    if (mObj.Booleans.ContainsKey("result"))
+                    {
+                        success = mObj.Booleans["result"];
+                        if (!success)
+                            errorCode = mObj.Strings.ContainsKey("errorCode") ? mObj.Strings["errorCode"] : mObj.Strings["errorMessage"];
+                    }
+
+                    OnMessage?.Invoke(new MinesEvent(success, errorCode, mObj.Mobjects["mobject"]));
                     break;
                 case "login":
                     OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
@@ -174,6 +177,15 @@ namespace MMO_Client.Client.Net.Mines
                     Logger.Error($"Unknown Message Type \"{mObj.Strings["type"]}\"", title, true);
                     break;
             }
+        }
+
+        public void SendMobject(Mobject mObj)
+        {
+            Mobject newMobj = new();
+            newMobj.Strings["type"] = "data";
+            newMobj.Mobjects["mobject"] = mObj;
+
+            Send(newMobj);
         }
     }
 }
