@@ -6,7 +6,7 @@ namespace MMO_Client.Screens
 {
     public partial class LoginScreen : Window
     {
-        public event Events.String2Event OnLoginEvent;
+        internal event Events.String2Event OnLoginEvent;
 
         public LoginScreen() => 
             InitializeComponent();

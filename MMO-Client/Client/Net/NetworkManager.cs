@@ -80,9 +80,9 @@ namespace MMO_Client.Client.Net
             Instance = this;
 
             mines = new();
-            mines.OnConnect += OnConnect;
-            mines.OnLogin += OnLogin;
-            mines.OnLogout += OnLogout;
+            mines.OnConnect += (MinesEvent ev) => OnConnect?.Invoke(ev);
+            mines.OnLogin += (MinesEvent ev) => OnLogin?.Invoke(ev);
+            mines.OnLogout += (MinesEvent ev) => OnLogout?.Invoke(ev);
             mines.OnMessage += HandleMamboEvent;
 
             Logger.Info("Network Manager Created", title);
@@ -105,6 +105,9 @@ namespace MMO_Client.Client.Net
             mines.SendMobject(mObj);
         }
 
+        public void MinesSend(Mobject mObj) => 
+            mines.Send(mObj);
+
         private void HandleMamboEvent(MinesEvent mEvent)
         {
             string type = mEvent.Mobject.Strings["type"];
@@ -113,7 +116,7 @@ namespace MMO_Client.Client.Net
                 Logger.Warn($"Received a failing \"{type}\". Error Code: {mEvent.ErrorCode}", title);
 #if NetworkDebug
             else
-                Logger.Debug($"Received a successful \"{type}\" ({(mEvent.Mobject != null ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})", title);
+                Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})", title);
 #endif
 
             switch(type)
