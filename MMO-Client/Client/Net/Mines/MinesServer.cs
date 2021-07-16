@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using MMO_Client.Common;
 using MMO_Client.Client.Net.Mines.Mobjects;
 using MMO_Client.Client.Net.Mines.IO;
@@ -14,6 +15,7 @@ namespace MMO_Client.Client.Net.Mines
     internal class MinesServer : Module
     {
         public static MinesServer Instance;
+        public override string Name { get; } = "Mines";
 
         public Events.Mines1Event OnConnect;
         public Events.Mines1Event OnLogin;
@@ -22,7 +24,7 @@ namespace MMO_Client.Client.Net.Mines
 
         private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
 
-        public override string Name { get; } = "Mines";
+        private Message pendingMessage;
 
         public override void Initialize()
         {
@@ -148,22 +150,36 @@ namespace MMO_Client.Client.Net.Mines
             ByteArray byteArray = new();
             byteArray.WriteBytes(data, 0, data.Length);
 
-            int header = byteArray.ReadByte();
-            if (header != Message.HEADER_TYPE)
+            if (pendingMessage == null)
             {
-                Logger.Error($"Unknown Header {(char)header} [{header}]", Name, true);
-                return;
+                int header = byteArray.ReadByte();
+                if (header != Message.HEADER_TYPE)
+                {
+                    Logger.Error($"Unknown Header {(char)header} [{header}]", Name, true);
+                    return;
+                }
+
+                pendingMessage = new();
             }
 
-            Message msg = new();
-            msg.SetPayload(byteArray.ReadInt());
+            if (pendingMessage.NeedsPayload)
+            {
+                if (data.Length < 4)
+                    return;
 
-            msg.Read(byteArray);
+                pendingMessage.SetPayload(byteArray.ReadInt());
+            }
 
-            if (msg.IsComplete())
-                ProcessMessage(msg);
+            pendingMessage.Read(byteArray);
+            if (pendingMessage.IsComplete())
+            {
+                ProcessMessage(pendingMessage);
+                pendingMessage = null;
+            }
+#if NetworkDebugVerbose
             else
-                Logger.Error("Message isn't complete!!!", Name, true);
+                Logger.Debug($"Message isn't complete, waiting for more bytes ({pendingMessage.Length}/{pendingMessage.Payload})", Name);
+#endif
         }
 
         private void ProcessMessage(Message msg)
@@ -186,8 +202,6 @@ namespace MMO_Client.Client.Net.Mines
                             Logger.Debug("Does the mobject contain any error code?");
                         }
                     }
-                    else
-                        Logger.Warn("Message doesn't contain success result", Name);
 
                     OnMessage?.Invoke(new MinesEvent(success, errorCode, mObj.Mobjects["mobject"]));
                     break;
