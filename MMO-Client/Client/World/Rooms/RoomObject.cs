@@ -43,7 +43,7 @@ namespace MMO_Client.Client.World.Rooms
         /// </summary>
         private void LoadAsset()
         {
-            imageAsset = AssetsManager.CreateImageAsset(Name);
+            imageAsset = AssetsManager.Instance.GetOrCreateImageAsset(Name);
 
             double xPos = Coord.X * Tile.Width;
             Canvas.SetLeft(imageAsset.Image, xPos);

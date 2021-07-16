@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MMO_Client.Common;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.Net.Mines.Event;
 using MMO_Client.Client.Net.Mines.Mobjects;
+using MMO_Client.Client.Net.Requests;
 
 namespace MMO_Client.Client.Net
 {
-    class NetworkManager
+    internal class NetworkManager : Module
     {
         public static NetworkManager Instance;
-        private const string title = "Network Manager";
 
         #region events
         public Events.Mines1Event OnConnect;
@@ -73,50 +69,71 @@ namespace MMO_Client.Client.Net
         public Events.Mines1Event OnWhitelistData;
         #endregion
 
-        private readonly MinesServer mines;
+        private string preff;
+        private int counter = 0;
 
-        public NetworkManager()
+        public override string Name { get; } = "Network Manager";
+
+        public override void Initialize()
         {
             Instance = this;
 
-            mines = new();
-            mines.OnConnect += (MinesEvent ev) => OnConnect?.Invoke(ev);
-            mines.OnLogin += (MinesEvent ev) => OnLogin?.Invoke(ev);
-            mines.OnLogout += (MinesEvent ev) => OnLogout?.Invoke(ev);
-            mines.OnMessage += HandleMamboEvent;
+            MinesServer.Instance.OnConnect += (MinesEvent ev) => OnConnect?.Invoke(ev);
+            MinesServer.Instance.OnLogin += (MinesEvent ev) => OnLogin?.Invoke(ev);
+            MinesServer.Instance.OnLogout += (MinesEvent ev) => OnLogout?.Invoke(ev);
+            MinesServer.Instance.OnMessage += HandleMamboEvent;
 
-            Logger.Info("Network Manager Created", title);
+            Logger.Info("Initialized", Name);
 
 #if NetworkDebug
-            Logger.Debug("Network Debug is enabled", title);
+            Logger.Debug("Network Debug is enabled", Name);
 #endif
         }
 
+        public override void Terminate() => 
+            Logger.Info("Terminated", Name);
+
         public void Connect(string host, int port) =>
-            mines.Connect(host, port);
+            MinesServer.Instance.Connect(host, port);
 
         public void SendMobject(Mobject mObj)
         {
 #if NetworkDebug
-            Logger.Debug($"Sending Action {mObj.Strings["request"]}", title);
+            Logger.Debug($"Sending Action {mObj.Strings["request"]}", Name);
 #endif
 
             OnActionSent?.Invoke(new MinesEvent(true, "<empty>", mObj));
-            mines.SendMobject(mObj);
+            MinesServer.Instance.SendMobject(mObj);
         }
 
-        public void MinesSend(Mobject mObj) => 
-            mines.Send(mObj);
+        public void SendAction(MamboRequest request)
+        {
+            Mobject mObj = request.ToMobject();
+            mObj.Strings["request"] = request.Type;
+            mObj.Strings["messageId"] = GenerateID();
+            SendMobject(mObj);
+
+            OnUniqueActionSent?.Invoke(new MinesEvent(true, "<empty>", mObj));
+        }
+
+        public void LoginWithID(string username, string hash) =>
+            MinesServer.Instance.LoginWithID(username, hash);
+
+        private string GenerateID()
+        {
+            preff ??= DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "_";
+            return preff + counter++.ToString();
+        }
 
         private void HandleMamboEvent(MinesEvent mEvent)
         {
             string type = mEvent.Mobject.Strings["type"];
 
             if (!mEvent.Success)
-                Logger.Warn($"Received a failing \"{type}\". Error Code: {mEvent.ErrorCode}", title);
+                Logger.Warn($"Received a failing \"{type}\". Error Code: {mEvent.ErrorCode}", Name);
 #if NetworkDebug
             else
-                Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})", title);
+                Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})", Name);
 #endif
 
             switch(type)
@@ -138,9 +155,6 @@ namespace MMO_Client.Client.Net
                     break;
                 case "RoomDataResponse":
                     OnRoomData?.Invoke(mEvent);
-                    break;
-                case "UniqueActionSent":
-                    OnUniqueActionSent?.Invoke(mEvent);
                     break;
                 case "MarkMailAsReadActionResponse":
                     OnMailRead?.Invoke(mEvent);
@@ -233,7 +247,7 @@ namespace MMO_Client.Client.Net
                     OnAddedToInventory?.Invoke(mEvent);
                     break;
                 default:
-                    Logger.Error($"Unhandled Mambo Event {type}", title);
+                    Logger.Error($"Unhandled Mambo Event {type}", Name);
                     break;
             }
         }

@@ -10,23 +10,27 @@ using System;
 
 namespace MMO_Client.Client.Assets
 {
-    class AssetsManager
+    /// <summary>
+    /// The Assets Manager is responsible for loading and caching assets.
+    /// </summary>
+    class AssetsManager : Module
     {
+        public static AssetsManager Instance;
         public const string AssetsPath = @".\Assets";
-        private const string title = "Assets Manager";
 
-        private static AssetsManager instance;
         private readonly List<VectorAsset> vectorPool = new();
         private readonly List<ImageAsset> imagePool = new();
 
-        public AssetsManager()
+        public override string Name { get; } = "Assets Manager";
+
+        public override void Initialize()
         {
-            instance = this;
+            Instance = this;
 
             if (!Directory.Exists(AssetsPath))
             {
                 Directory.CreateDirectory(AssetsPath);
-                Logger.Warn("Assets folder didn't exist, so we created it", title);
+                Logger.Warn("Assets folder didn't exist, so we created it", Name);
             }
 
             BitmapImage errorImg = new();
@@ -36,8 +40,11 @@ namespace MMO_Client.Client.Assets
             errorImg.EndInit();
             ImageAsset.ErrorBitmapImage = errorImg;
 
-            Logger.Info("Assets Manager Created", title);
+            Logger.Info("Initialized", Name);
         }
+
+        public override void Terminate() => 
+            Logger.Info("Terminated", Name);
 
         public static string GetAssetPath(string ID)
         {
@@ -69,7 +76,7 @@ namespace MMO_Client.Client.Assets
         }
 
         #region Image Asset
-        private ImageAsset GetOrCreateImageAsset(string ID)
+        public ImageAsset GetOrCreateImageAsset(string ID)
         {
             ImageAsset assetToClone = null;
             for (int i = 0; i < imagePool.Count; i++)
@@ -78,7 +85,7 @@ namespace MMO_Client.Client.Assets
 
                 if (asset.IsBroken)
                 {
-                    Logger.Debug($"Removing broken image asset {ID} from pool", title);
+                    Logger.Debug($"Removing broken image asset {ID} from pool", Name);
                     imagePool.RemoveAt(i);
 
                     i--;
@@ -89,7 +96,7 @@ namespace MMO_Client.Client.Assets
                 {
                     if (asset.IsFree)
                     {
-                        Logger.Debug($"Recycling free image asset {ID}", title);
+                        Logger.Debug($"Recycling free image asset {ID}", Name);
 
                         asset.Unfree();
                         return asset;
@@ -103,13 +110,13 @@ namespace MMO_Client.Client.Assets
 
             if (assetToClone != null)
             {
-                Logger.Debug($"Cloning image asset {ID}", title);
+                Logger.Debug($"Cloning image asset {ID}", Name);
 
                 newAsset.Clone(assetToClone);
             }
             else
             {
-                Logger.Debug($"Creating image asset {ID}", title);
+                Logger.Debug($"Creating image asset {ID}", Name);
 
                 string path = GetAssetPath(ID);
                 if (path == null)
@@ -122,13 +129,10 @@ namespace MMO_Client.Client.Assets
             imagePool.Add(newAsset);
             return newAsset;
         }
-
-        public static ImageAsset CreateImageAsset(string ID) =>
-            instance.GetOrCreateImageAsset(ID);
         #endregion
 
         #region Vector Asset
-        private VectorAsset GetOrCreateVectorAsset(string ID)
+        public VectorAsset GetOrCreateVectorAsset(string ID)
         {
             VectorAsset assetToClone = null;
             foreach(VectorAsset v in vectorPool)
@@ -137,7 +141,7 @@ namespace MMO_Client.Client.Assets
                 {
                     if (v.IsFree)
                     {
-                        Logger.Debug($"Recycling free vector asset {ID}", title);
+                        Logger.Debug($"Recycling free vector asset {ID}", Name);
 
                         v.Recycle();
                         return v;
@@ -151,7 +155,7 @@ namespace MMO_Client.Client.Assets
 
             if (assetToClone != null)
             {
-                Logger.Debug($"Cloning vector asset {ID}", title);
+                Logger.Debug($"Cloning vector asset {ID}", Name);
 
                 newAsset.Initialize(assetToClone.InitialDrawing, assetToClone.Frames, assetToClone.MaxBounds);
                 newAsset.FPS = assetToClone.FPS;
@@ -159,7 +163,7 @@ namespace MMO_Client.Client.Assets
             } 
             else
             {
-                Logger.Debug($"Creating vector asset {ID}", title);
+                Logger.Debug($"Creating vector asset {ID}", Name);
 
                 string path = AssetsPath;
                 string[] splittedID = ID.Split(".");
@@ -176,7 +180,7 @@ namespace MMO_Client.Client.Assets
 
                 if (drawing == null)
                 {
-                    Logger.Error($"Couldn't get the drawing of the asset \"{ID}\"", title);
+                    Logger.Error($"Couldn't get the drawing of the asset \"{ID}\"", Name);
                     drawing = Xaml2Drawing($@"{AssetsPath}\MMOClient\error.xaml");
                 }
                 else
@@ -192,7 +196,7 @@ namespace MMO_Client.Client.Assets
                         }
                     }
 
-                    Logger.Debug($"Loaded {frames.Count} frames for {ID}", title);
+                    Logger.Debug($"Loaded {frames.Count} frames for {ID}", Name);
                 }
 
                 if (frames == null)
@@ -243,9 +247,6 @@ namespace MMO_Client.Client.Assets
 
             return true;
         }
-
-        public static VectorAsset CreateVectorAsset(string ID) =>
-            instance.GetOrCreateVectorAsset(ID);
         #endregion
     }
 }

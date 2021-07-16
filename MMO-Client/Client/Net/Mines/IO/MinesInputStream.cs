@@ -9,7 +9,7 @@ namespace MMO_Client.Client.Net.Mines.IO
 
         public MobjectData ReadMobjectData()
         {
-            MobjectData mData = null;
+            MobjectData mData;
 
             char dataType = (char)ReadByte();
             switch(dataType)
@@ -86,7 +86,7 @@ namespace MMO_Client.Client.Net.Mines.IO
 
                 default:
                     Logger.Error($"Invalid MobjectData header while reading: {dataType} [{(byte)dataType}]", "Mines Input Stream", true);
-                    break;
+                    return new("", "", MobjectDataType.STRING);
             }
 
             return mData;

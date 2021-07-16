@@ -8,17 +8,36 @@ using MMO_Client.Client.Net.Mines.Event;
 
 namespace MMO_Client.Client.Net.Mines
 {
-    class MinesServer
+    /// <summary>
+    /// The Mines Server Module is responsible for the client-server communication.
+    /// </summary>
+    internal class MinesServer : Module
     {
+        public static MinesServer Instance;
+
         public Events.Mines1Event OnConnect;
         public Events.Mines1Event OnLogin;
         public Events.Mines1Event OnLogout;
         public Events.Mines1Event OnMessage;
 
-        private const string title = "Mines";
         private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
 
-        public MinesServer() { }
+        public override string Name { get; } = "Mines";
+
+        public override void Initialize()
+        {
+            Instance = this;
+
+            Logger.Info("Initialized", Name);
+        }
+
+        public override void Terminate()
+        {
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
+
+            Logger.Info("Terminated", Name);
+        }
 
         /// <summary>
         /// Connects the socket to the specified host and starts the read loop if the connection was successful.
@@ -27,7 +46,7 @@ namespace MMO_Client.Client.Net.Mines
         {
             try
             {
-                Logger.Info($"Connecting to {host}:{port}", title);
+                Logger.Info($"Connecting to {host}:{port}", Name);
                 socket.Connect(host, port);
 
                 if (socket.Connected)
@@ -42,8 +61,8 @@ namespace MMO_Client.Client.Net.Mines
             }
             catch (Exception e)
             {
-                Logger.Error($"Error while connecting to {host}:{port}", title);
-                Logger.Error(e.ToString(), title);
+                Logger.Error($"Error while connecting to {host}:{port}", Name);
+                Logger.Error(e.ToString(), Name);
 
                 OnConnect?.Invoke(new MinesEvent(false, "0", null));
             }
@@ -66,8 +85,8 @@ namespace MMO_Client.Client.Net.Mines
                 b[i] = mos.Bytes[i];
             }
 
-            Logger.Debug($"Sending Mobject {mobj.ToString().Replace("\n", ",")}", title);
-            Logger.Debug($"Bytes: {result}", title);
+            Logger.Debug($"Sending Mobject {mobj.ToString().Replace("\n", ",")}", Name);
+            Logger.Debug($"Bytes: {result}", Name);
 #endif
 
             byte[] bytesToSend = new byte[mos.Bytes.Count + 5];
@@ -112,13 +131,13 @@ namespace MMO_Client.Client.Net.Mines
 
             if (bytesRead > 0)
             {
-                Logger.Debug($"{bytesRead} bytes read", title);
+                Logger.Debug($"{bytesRead} bytes read", Name);
 
                 byte[] buffer = (byte[])ar.AsyncState;
                 HandleSocketData(buffer);
             }
             else
-                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", title, true);
+                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", Name, true);
         }
 
         private void HandleSocketData(byte[] data)
@@ -129,7 +148,7 @@ namespace MMO_Client.Client.Net.Mines
             int header = byteArray.ReadByte();
             if (header != Message.HEADER_TYPE)
             {
-                Logger.Error($"Unknown Header {(char)header} [{header}]", title, true);
+                Logger.Error($"Unknown Header {(char)header} [{header}]", Name, true);
                 return;
             }
 
@@ -141,7 +160,7 @@ namespace MMO_Client.Client.Net.Mines
             if (msg.IsComplete())
                 ProcessMessage(msg);
             else
-                Logger.Error("Message isn't complete!!!", title, true);
+                Logger.Error("Message isn't complete!!!", Name, true);
         }
 
         private void ProcessMessage(Message msg)
@@ -167,14 +186,14 @@ namespace MMO_Client.Client.Net.Mines
                     break;
                 case "login":
                     OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
-                    Logger.Debug("Login!!!", title, true);
+                    Logger.Debug("Login!!!", Name, true);
                     break;
                 case "logout":
                     OnLogout?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
-                    Logger.Debug("Logout!!!", title, true);
+                    Logger.Debug("Logout!!!", Name, true);
                     break;
                 default:
-                    Logger.Error($"Unknown Message Type \"{mObj.Strings["type"]}\"", title, true);
+                    Logger.Error($"Unknown Message Type \"{mObj.Strings["type"]}\"", Name, true);
                     break;
             }
         }
@@ -186,6 +205,18 @@ namespace MMO_Client.Client.Net.Mines
             newMobj.Mobjects["mobject"] = mObj;
 
             Send(newMobj);
+        }
+
+        public void LoginWithID(string username, string hash)
+        {
+            Mobject mobj = new();
+            mobj.Strings["size"] = "5370589";
+            mobj.Strings["hash"] = hash;
+            mobj.Strings["type"] = "login";
+            mobj.Strings["check"] = "haha";
+            mobj.Strings["username"] = username;
+
+            Send(mobj);
         }
     }
 }
