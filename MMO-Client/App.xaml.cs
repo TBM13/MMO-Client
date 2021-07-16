@@ -58,7 +58,6 @@ namespace MMO_Client
             foreach (Module module in criticalModules)
                 module.Initialize();
 
-            return;
             NetworkManager.Instance.OnConnect += OnConnect;
             NetworkManager.Instance.Connect("juegosg1395.mundogaturro.com", 9899);
         }
@@ -72,7 +71,7 @@ namespace MMO_Client
 
             _ = new RoomManager();
 
-            NetworkManager.Instance.LoginWithID("TEST001", "V4gS8UmVn8OHJQK57J9NPQ1kmOmF7C4tw1A9uQ8ou0gGZ0SA0f9bV0QI2P2mA93E");
+            NetworkManager.Instance.LoginWithID("TEST001", "VvBM8y8FVz60w52g6xwSPVyQdaTwbjb33yk8lmpSEV8bk2s3AY3U10u93z07n4xn");
         }
     }
 }

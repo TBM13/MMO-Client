@@ -88,6 +88,9 @@ namespace MMO_Client.Client.Net
 #if NetworkDebug
             Logger.Debug("Network Debug is enabled", Name);
 #endif
+#if NetworkDebugVerbose
+            Logger.Debug("Verbose Network Debug is enabled", Name);
+#endif
         }
 
         public override void Terminate() => 
@@ -136,7 +139,7 @@ namespace MMO_Client.Client.Net
                 Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})", Name);
 #endif
 
-            switch(type)
+            switch (type)
             {
                 case "BuddyStatusChanged":
                     OnBuddyStatusChanged?.Invoke(mEvent);

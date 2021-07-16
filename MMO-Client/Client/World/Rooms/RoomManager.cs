@@ -32,7 +32,7 @@ namespace MMO_Client.Client.World.Rooms
             if (!mEvent.Success)
                 return;
 
-            Logger.Debug(mEvent.ToString(), "");
+            Logger.Debug(mEvent.Mobject.ToString());
         }
 
         private void OnAvatarJoins(MinesEvent mEvent)

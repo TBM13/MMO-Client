@@ -76,7 +76,9 @@ namespace MMO_Client.Client.Net.Mines
             MinesOutputStream mos = new();
             mos.WriteMobject(mobj);
 
-#if NetworkDebug
+#if NetworkDebugVerbose
+            Logger.Debug($"Sending Mobject {mobj.ToString().Replace("\n", ",")}", Name);
+
             string result = "";
             byte[] b = new byte[mos.Bytes.Count];
             for (int i = 0; i < mos.Bytes.Count; i++)
@@ -85,7 +87,6 @@ namespace MMO_Client.Client.Net.Mines
                 b[i] = mos.Bytes[i];
             }
 
-            Logger.Debug($"Sending Mobject {mobj.ToString().Replace("\n", ",")}", Name);
             Logger.Debug($"Bytes: {result}", Name);
 #endif
 
@@ -131,7 +132,9 @@ namespace MMO_Client.Client.Net.Mines
 
             if (bytesRead > 0)
             {
+#if NetworkDebugVerbose
                 Logger.Debug($"{bytesRead} bytes read", Name);
+#endif
 
                 byte[] buffer = (byte[])ar.AsyncState;
                 HandleSocketData(buffer);
@@ -175,12 +178,16 @@ namespace MMO_Client.Client.Net.Mines
                     bool success = true;
                     string errorCode = "<empty>";
 
-                    if (mObj.Booleans.ContainsKey("result"))
+                    if (mObj.Mobjects["mobject"].Booleans.ContainsKey("success"))
                     {
-                        success = mObj.Booleans["result"];
+                        success = mObj.Mobjects["mobject"].Booleans["success"];
                         if (!success)
-                            errorCode = mObj.Strings.ContainsKey("errorCode") ? mObj.Strings["errorCode"] : mObj.Strings["errorMessage"];
+                        {
+                            Logger.Debug("Does the mobject contain any error code?");
+                        }
                     }
+                    else
+                        Logger.Warn("Message doesn't contain success result", Name);
 
                     OnMessage?.Invoke(new MinesEvent(success, errorCode, mObj.Mobjects["mobject"]));
                     break;
@@ -210,7 +217,7 @@ namespace MMO_Client.Client.Net.Mines
         public void LoginWithID(string username, string hash)
         {
             Mobject mobj = new();
-            mobj.Strings["size"] = "5370589";
+            mobj.Strings["size"] = "5367773";
             mobj.Strings["hash"] = hash;
             mobj.Strings["type"] = "login";
             mobj.Strings["check"] = "haha";
