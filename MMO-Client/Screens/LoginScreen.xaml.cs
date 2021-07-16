@@ -10,7 +10,7 @@ namespace MMO_Client.Screens
 {
     public partial class LoginScreen : Window
     {
-        internal event Events.String1Event OnLoginIdReceivedEvent;
+        internal event Events.String2Event OnLoginIdReceivedEvent;
 
         private const string LogTitle = "Login Screen";
 
@@ -183,7 +183,7 @@ namespace MMO_Client.Screens
 
             Logger.Info("Login Successful", LogTitle);
 
-            OnLoginIdReceivedEvent?.Invoke(loginId);
+            OnLoginIdReceivedEvent?.Invoke(UsernameTextbox.Text, loginId);
             Close();
         }
     }

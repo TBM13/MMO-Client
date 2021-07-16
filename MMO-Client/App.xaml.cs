@@ -63,10 +63,12 @@ namespace MMO_Client
             loginScreen.OnLoginIdReceivedEvent += LoginScreen_OnLoginReceivedEvent;
         }
 
+        string username;
         string loginHash;
 
-        private void LoginScreen_OnLoginReceivedEvent(string hash)
+        private void LoginScreen_OnLoginReceivedEvent(string username, string hash)
         {
+            this.username = username;
             loginHash = hash;
             NetworkManager.Instance.OnConnect += OnConnect;
             NetworkManager.Instance.Connect("juegosg1395.mundogaturro.com", 9899);
@@ -81,7 +83,7 @@ namespace MMO_Client
 
             _ = new RoomManager();
 
-            NetworkManager.Instance.LoginWithID("TEST001", loginHash);
+            NetworkManager.Instance.LoginWithID(username, loginHash);
         }
     }
 }
