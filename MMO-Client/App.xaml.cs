@@ -53,7 +53,6 @@ namespace MMO_Client
         private void Setup()
         {
             _ = new Logger();
-            _ = new GameScreen();
 
             foreach (Module module in criticalModules)
                 module.Initialize();
@@ -70,6 +69,9 @@ namespace MMO_Client
         {
             this.username = username;
             loginHash = hash;
+
+            _ = new GameScreen();
+
             NetworkManager.Instance.OnConnect += OnConnect;
             NetworkManager.Instance.Connect("juegosg1395.mundogaturro.com", 9899);
         }

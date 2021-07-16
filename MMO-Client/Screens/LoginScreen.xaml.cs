@@ -170,14 +170,21 @@ namespace MMO_Client.Screens
                 return;
             }
 
-            string loginId = await response.Content.ReadAsStringAsync();
+            string content = await response.Content.ReadAsStringAsync();
+            string loginId = content;
             loginId = loginId.Remove(0, loginId.IndexOf("loginId=", StringComparison.InvariantCulture) + 8);
             loginId = loginId.Remove(loginId.IndexOf("&", StringComparison.InvariantCulture));
 
             if (loginId.Length != 64)
             {
                 Logger.Error($"We were expecting the login ID to have 64 characters, but it has {loginId.Length}", LogTitle);
-                Logger.Debug(loginId, LogTitle);
+
+                if (content.Contains("https://descargas.mundogaturro.com/mundogaturro_installer_la.exe"))
+                {
+                    Logger.Info("Retrying...", LogTitle);
+                    GetLoginID(gaturroToken, xsrfToken);
+                }
+
                 return;
             }
 
