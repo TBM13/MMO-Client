@@ -18,7 +18,6 @@ namespace MMO_Client.Client.Net.Mines
         public override string Name { get; } = "Mines";
 
         public Events.Mines1Event OnConnect;
-        public Events.Mines1Event OnLogin;
         public Events.Mines1Event OnLogout;
         public Events.Mines1Event OnMessage;
 
@@ -206,7 +205,7 @@ namespace MMO_Client.Client.Net.Mines
                     OnMessage?.Invoke(new MinesEvent(success, errorCode, mObj.Mobjects["mobject"]));
                     break;
                 case "login":
-                    OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
+                    //OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
                     Logger.Debug("Login!!!", Name, true);
                     break;
                 case "logout":

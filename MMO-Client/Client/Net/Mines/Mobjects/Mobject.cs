@@ -46,12 +46,31 @@ namespace MMO_Client.Client.Net.Mines.Mobjects
             return list;
         }
 
-        public override string ToString()
+        public override string ToString() => 
+            ToString(0);
+
+        public string ToString(int depth = 0)
         {
             string result = "";
 
-            foreach(MobjectData mData in Iterator())
-                result += $"[{mData.Key}] {mData.GetValueAsString()}\n";
+            int i = 0;
+            string newLine = "\n";
+            while (i < depth)
+            {
+                newLine += "   ";
+                i++;
+            }
+
+            foreach (MobjectData mData in Iterator())
+            {
+                if (mData.DataType == MobjectDataType.MOBJECT || mData.DataType == MobjectDataType.MOBJECT_ARRAY)
+                    result += $"[{mData.Key}] {$"{mData.Value.GetType()}->{newLine + "   "}{mData.GetValueAsString(depth)}"}\n";
+                else
+                    result += $"[{mData.Key}] {$"{mData.Value.GetType()}-> {mData.GetValueAsString(depth)}"}\n";
+            }
+
+            if (depth > 0)
+                result = result.Replace("\n", newLine);
 
             return result;
         }

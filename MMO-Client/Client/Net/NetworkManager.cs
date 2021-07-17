@@ -13,7 +13,6 @@ namespace MMO_Client.Client.Net
 
         #region events
         public Events.Mines1Event OnConnect;
-        public Events.Mines1Event OnLogin;
         public Events.Mines1Event OnLogout;
 
         public Events.Mines1Event OnBuddyAdded;
@@ -79,7 +78,6 @@ namespace MMO_Client.Client.Net
             Instance = this;
 
             MinesServer.Instance.OnConnect += (MinesEvent ev) => OnConnect?.Invoke(ev);
-            MinesServer.Instance.OnLogin += (MinesEvent ev) => OnLogin?.Invoke(ev);
             MinesServer.Instance.OnLogout += (MinesEvent ev) => OnLogout?.Invoke(ev);
             MinesServer.Instance.OnMessage += HandleMamboEvent;
 
