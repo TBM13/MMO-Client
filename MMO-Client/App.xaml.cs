@@ -64,14 +64,17 @@ namespace MMO_Client
 
             LoginScreen loginScreen = new();
             loginScreen.Show();
-            loginScreen.OnLoginIdReceivedEvent += LoginScreen_OnLoginReceivedEvent;
+            loginScreen.OnLoginAttempt += LoginScreen_OnLoginAttempt;
         }
 
         string username;
         string loginHash;
 
-        private void LoginScreen_OnLoginReceivedEvent(string username, string hash)
+        private void LoginScreen_OnLoginAttempt(string username, string hash, bool success)
         {
+            if (!success)
+                return;
+
             this.username = username;
             loginHash = hash;
 

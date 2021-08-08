@@ -10,28 +10,61 @@ namespace MMO_Client.Screens
 {
     public partial class LoginScreen : Window
     {
-        internal event Events.String2Event OnLoginIdReceivedEvent;
+        internal event Events.String2BoolEvent OnLoginAttempt;
 
         private const string LogTitle = "Login Screen";
 
-        public LoginScreen() => 
+        public LoginScreen()
+        {
             InitializeComponent();
+            PopulateSavedCredentialsList();
+        }
 
-        private void PwdPasswordbox_PasswordChanged(object sender, RoutedEventArgs e) =>
-            LoginButton.IsEnabled = UsernameTextbox.Text.Length >= 4 && PwdPasswordbox.Password.Length >= 4;
-
-        private void UsernameTextbox_TextChanged(object sender, TextChangedEventArgs e) =>
-            LoginButton.IsEnabled = UsernameTextbox.Text.Length >= 4 && PwdPasswordbox.Password.Length >= 4;
+        private void Box_TextChanged(object sender, RoutedEventArgs e)
+        {
+            bool validCredentials = ValidateCredentials();
+            LoginButton.IsEnabled = validCredentials;
+            SaveButton.IsEnabled = validCredentials;
+        }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            GetCsrfAndSessionToken();
+            OnLoginAttempt += OnLoginEvent;
+            Login();
         }
 
-        private async void GetCsrfAndSessionToken()
+        private void OnLoginEvent(string username, string loginId, bool success)
         {
-            Logger.Info("Attempting to get CSRF Token and Login Session cookies...", LogTitle);
+            OnLoginAttempt -= OnLoginEvent;
+            LoginProgressbar.Visibility = Visibility.Hidden;
+            SavedCredentialsList.IsEnabled = true;
 
+            if (success)
+                Close();
+        }
+
+        private bool ValidateCredentials()
+        {
+            if (UsernameBox.Text.Length < 4)
+                return false;
+            if (PwdBox.Password.Length < 4)
+                return false;
+
+            if (UsernameBox.Text.Length > 16)
+                return false;
+            if (PwdBox.Password.Length >= 16)
+                return false;
+
+            return true;
+        }
+
+        private async void Login()
+        {
+            LoginProgressbar.Value = 0;
+            LoginProgressbar.Visibility = Visibility.Visible;
+            SavedCredentialsList.IsEnabled = false;
+
+            Logger.Debug("Attempting to get CSRF Token and Login Session cookies...");
             Uri loginUri = new("https://login.mundogaturro.com/");
 
             CookieContainer cookieContainer = new();
@@ -39,26 +72,30 @@ namespace MMO_Client.Screens
             using HttpClient client = new(handler);
 
             HttpResponseMessage response = await client.GetAsync(loginUri);
+            LoginProgressbar.Value = 20;
+
             if (!response.IsSuccessStatusCode)
             {
-                Logger.Error($"Unexpected status code {response.StatusCode}. Check your internet connection and try again", LogTitle);
+                Logger.Error($"Unexpected status code {response.StatusCode}. Check your internet connection and try again");
+                OnLoginAttempt?.Invoke(UsernameBox.Text.ToUpperInvariant(), "", false);
                 return;
             }
 
             string csrfToken = await response.Content.ReadAsStringAsync();
             csrfToken = csrfToken.Remove(0, csrfToken.IndexOf("csrf-token\" content=\"", StringComparison.InvariantCulture) + 21);
             csrfToken = csrfToken.Remove(csrfToken.IndexOf("\"", StringComparison.InvariantCulture));
+            LoginProgressbar.Value = 40;
 
             if (csrfToken.Length != 40)
             {
-                Logger.Error($"We were expecting the CSRF Token to have 40 characters, but it has {csrfToken.Length}", LogTitle);
-                Logger.Debug(csrfToken, LogTitle);
+                Logger.Error($"We were expecting the CSRF Token to have 40 characters, but it has {csrfToken.Length}");
+                Logger.Debug(csrfToken);
+                OnLoginAttempt?.Invoke(UsernameBox.Text.ToUpperInvariant(), "", false);
                 return;
             }
 
-            string loginSession = null;
-            IEnumerable<Cookie> responseCookies = cookieContainer.GetCookies(loginUri);
-            foreach (Cookie cookie in responseCookies)
+            string? loginSession = null;
+            foreach (Cookie cookie in cookieContainer.GetCookies(loginUri))
             {
                 if (cookie.Name == "login_session")
                 {
@@ -69,16 +106,17 @@ namespace MMO_Client.Screens
 
             if (loginSession == null)
             {
-                Logger.Error("Couldn't get Login Session cookie", LogTitle);
+                Logger.Error("Couldn't get Login Session cookie");
+                OnLoginAttempt?.Invoke(UsernameBox.Text.ToUpperInvariant(), "", false);
                 return;
             }
 
-            GetGaturroToken(UsernameTextbox.Text, PwdPasswordbox.Password, csrfToken, loginSession);
+            GetGaturroToken(UsernameBox.Text, PwdBox.Password, csrfToken, loginSession);
         }
 
         private async void GetGaturroToken(string username, string password, string csrfToken, string loginSession)
         {
-            Logger.Info("Attempting to get gaturro token cookie...", LogTitle);
+            Logger.Debug("Attempting to get gaturro token cookie...");
 
             Uri loginUri = new("http://desktop.mundogaturro.com/auth");
 
@@ -88,7 +126,9 @@ namespace MMO_Client.Screens
 
             cookieContainer.Add(loginUri, new Cookie("login_session", loginSession));
 
-            Dictionary<string, string> postBody = new()
+#pragma warning disable CS8714
+            Dictionary<string?, string?> postBody = new()
+#pragma warning restore CS8714
             {
                 { "_token", csrfToken },
                 { "username", username },
@@ -97,23 +137,26 @@ namespace MMO_Client.Screens
 
             FormUrlEncodedContent content = new(postBody);
             HttpResponseMessage response = await client.PostAsync(loginUri, content);
+            LoginProgressbar.Value = 60;
+
             if (!response.IsSuccessStatusCode)
             {
                 if ((int)response.StatusCode == 419)
                 {
-                    Logger.Error("Status code 419. This probably means a header/cookie/body-data is wrong/missing.", LogTitle);
+                    Logger.Error("Status code 419. This probably means a header/cookie/body-data is wrong/missing.");
+                    OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
                     return;
                 }
 
-                Logger.Error($"Unexpected status code {response.StatusCode}. Check your internet connection and try again", LogTitle);
+                Logger.Error($"Unexpected status code {response.StatusCode}. Check your internet connection and try again");
+                OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
                 return;
             }
 
-            string gaturroToken = null;
-            string xsrfToken = null;
+            string? gaturroToken = null;
+            string? xsrfToken = null;
 
-            IEnumerable<Cookie> responseCookies = cookieContainer.GetCookies(loginUri);
-            foreach (Cookie cookie in responseCookies)
+            foreach (Cookie cookie in cookieContainer.GetCookies(loginUri))
             {
                 switch (cookie.Name)
                 {
@@ -132,20 +175,22 @@ namespace MMO_Client.Screens
             {
                 if (xsrfToken == null)
                 {
-                    Logger.Error("Couldn't get XSRF-TOKEN cookie", LogTitle);
+                    Logger.Error("Couldn't get XSRF-TOKEN cookie");
+                    OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
                     return;
                 }
 
-                GetLoginID(gaturroToken, xsrfToken);
+                GetLoginID(gaturroToken, xsrfToken, username);
                 return;
             }
 
-            Logger.Error("Wrong username and/or password", LogTitle);
+            Logger.Error("Wrong username and/or password");
+            OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
         }
 
-        private async void GetLoginID(string gaturroToken, string xsrfToken)
+        private async void GetLoginID(string gaturroToken, string xsrfToken, string username)
         {
-            Logger.Info("Attempting to get login ID...", LogTitle);
+            Logger.Debug("Attempting to get login ID...");
 
             Uri mmoUri = new("https://mmo.mundogaturro.com/");
 
@@ -158,40 +203,119 @@ namespace MMO_Client.Screens
             cookieContainer.Add(mmoUri, new Cookie("XSRF-TOKEN", xsrfToken));
 
             HttpResponseMessage response = await client.GetAsync(mmoUri);
+            LoginProgressbar.Value = 80;
+
             if (!response.IsSuccessStatusCode)
             {
-                Logger.Error($"Unexpected status code {response.StatusCode}. Check your internet connection and try again", LogTitle);
+                Logger.Error($"Unexpected status code {response.StatusCode}. Check your internet connection and try again");
+                OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
                 return;
             }
 
             if (response.StatusCode == HttpStatusCode.Redirect)
             {
-                Logger.Error("Redirect detected. This shouldn't have happened", LogTitle);
+                Logger.Error("Redirect detected. This shouldn't have happened");
+                OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
                 return;
             }
 
             string content = await response.Content.ReadAsStringAsync();
+
             string loginId = content;
             loginId = loginId.Remove(0, loginId.IndexOf("loginId=", StringComparison.InvariantCulture) + 8);
             loginId = loginId.Remove(loginId.IndexOf("&", StringComparison.InvariantCulture));
 
             if (loginId.Length != 64)
             {
-                Logger.Error($"We were expecting the login ID to have 64 characters, but it has {loginId.Length}", LogTitle);
+                Logger.Error($"We were expecting the login ID to have 64 characters, but it has {loginId.Length}");
 
                 if (content.Contains("https://descargas.mundogaturro.com/mundogaturro_installer_la.exe"))
                 {
-                    Logger.Info("Retrying...", LogTitle);
-                    GetLoginID(gaturroToken, xsrfToken);
+                    Logger.Info("Retrying...");
+                    GetLoginID(gaturroToken, xsrfToken, username);
                 }
 
                 return;
             }
 
-            Logger.Info("Login Successful", LogTitle);
+            LoginProgressbar.Value = 100;
+            Logger.Info("Login Successful");
 
-            OnLoginIdReceivedEvent?.Invoke(UsernameTextbox.Text, loginId);
-            Close();
+            OnLoginAttempt?.Invoke(username.ToUpperInvariant(), loginId, true);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            string username = UsernameBox.Text;
+            string password = PwdBox.Password;
+
+            if (username.Contains(";") || password.Contains(";"))
+            {
+                Logger.Error("The username and password can't contain the character ';'");
+                return;
+            }
+
+            int i = SavedCredentialsList.SelectedIndex;
+            if (i < 1)
+            {
+                Settings.Default.SavedCredentials.Add($"{username};{password}");
+
+                ListViewItem item = new() { Content = username };
+                SavedCredentialsList.Items.Add(item);
+            }
+            else
+            {
+                Settings.Default.SavedCredentials[i - 1] = $"{username};{password}";
+                ((ListViewItem)SavedCredentialsList.Items[i]).Content = username;
+            }
+
+            Settings.Default.Save();
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            int i = SavedCredentialsList.SelectedIndex;
+
+            Settings.Default.SavedCredentials.RemoveAt(i - 1);
+            Settings.Default.Save();
+
+            SavedCredentialsList.Items.RemoveAt(i);
+            DeleteButton.IsEnabled = false;
+        }
+
+        private void SavedCredentialsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int i = SavedCredentialsList.SelectedIndex;
+            if (i < 1)
+            {
+                DeleteButton.IsEnabled = false;
+                return;
+            }
+
+            string[] data = Settings.Default.SavedCredentials[i - 1].Split(';');
+            UsernameBox.Text = data[0];
+            PwdBox.Password = data[1];
+
+            DeleteButton.IsEnabled = true;
+        }
+
+        private void PopulateSavedCredentialsList()
+        {
+            foreach (string s in Settings.Default.SavedCredentials)
+            {
+                ListViewItem item = new()
+                {
+                    Content = s.Split(';')[0]
+                };
+
+                item.MouseDoubleClick += (sender, e) =>
+                {
+                    OnLoginAttempt += OnLoginEvent;
+                    Login();
+                };
+
+                SavedCredentialsList.Items.Add(item);
+            }
         }
     }
 }
