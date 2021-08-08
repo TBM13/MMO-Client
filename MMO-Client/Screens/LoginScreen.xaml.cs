@@ -254,8 +254,7 @@ namespace MMO_Client.Screens
             {
                 Settings.Default.SavedCredentials.Add($"{username};{password}");
 
-                ListViewItem item = new() { Content = username };
-                SavedCredentialsList.Items.Add(item);
+                AddSavedCrendetialsItem(username);
             }
             else
             {
@@ -296,20 +295,23 @@ namespace MMO_Client.Screens
         private void PopulateSavedCredentialsList()
         {
             foreach (string s in Settings.Default.SavedCredentials)
+                AddSavedCrendetialsItem(s.Split(';')[0]);
+        }
+
+        private void AddSavedCrendetialsItem(string username)
+        {
+            ListViewItem item = new()
             {
-                ListViewItem item = new()
-                {
-                    Content = s.Split(';')[0]
-                };
+                Content = username
+            };
 
-                item.MouseDoubleClick += (sender, e) =>
-                {
-                    OnLoginAttempt += OnLoginEvent;
-                    Login();
-                };
+            item.MouseDoubleClick += (sender, e) =>
+            {
+                OnLoginAttempt += OnLoginEvent;
+                Login();
+            };
 
-                SavedCredentialsList.Items.Add(item);
-            }
+            SavedCredentialsList.Items.Add(item);
         }
     }
 }
