@@ -4,26 +4,32 @@ using System.Text.Json;
 
 namespace MMO_Client.Client.Config
 {
-    internal static class Settings
+    internal class Settings
     {
-        public static Dictionary<string, dynamic> Dictionary { get; } = new();
+        public static Settings Instance { get; private set; }
+
+        public Events.Bool1Event OnSettingsLoaded { get; set; }
+        public Dictionary<string, dynamic> Dictionary { get; } = new();
 
         private const string settingsUri = "https://cdn-ar.mundogaturro.com/juego/cfgs/settings.json";
         private const string gameplayUri = "https://cdn-ar.mundogaturro.com/juego/cfgs/gameplay.json";
 
-        public static void LoadSettings()
+        public Settings() =>
+            Instance = this;
+
+        public void LoadSettings()
         {
             Logger.Info("Loading Settings...");
             LoadFile(settingsUri);
         }
 
-        public static void LoadGameplaySettings()
+        public void LoadGameplaySettings()
         {
             Logger.Info("Loading Gameplay Settings...");
             LoadFile(gameplayUri);
         }
 
-        private static void LoadFile(string url)
+        private void LoadFile(string url)
         {
             LoadFile lf = new();
             lf.OnFileLoaded += (data) =>
@@ -31,12 +37,17 @@ namespace MMO_Client.Client.Config
                 Dictionary<string, dynamic> dic = ParseJson(data);
                 foreach (KeyValuePair<string, dynamic> pair in dic)
                     Dictionary.Add(pair.Key, pair.Value);
+
+                OnSettingsLoaded?.Invoke(true);
             };
+
+            lf.OnError += (_) =>
+                OnSettingsLoaded?.Invoke(false);
 
             lf.Load(url);
         }
 
-        private static Dictionary<string, dynamic> ParseJson(string data)
+        private Dictionary<string, dynamic> ParseJson(string data)
         {
             JsonSerializerOptions options = new()
             {
@@ -50,7 +61,7 @@ namespace MMO_Client.Client.Config
             return dic;
         }
 
-        private static dynamic ParseJsonElement(JsonElement elem)
+        private dynamic ParseJsonElement(JsonElement elem)
         {
             switch (elem.ValueKind)
             {
