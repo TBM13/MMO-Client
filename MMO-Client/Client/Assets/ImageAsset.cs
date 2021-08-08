@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using MMO_Client.Common;
 
 namespace MMO_Client.Client.Assets
 {

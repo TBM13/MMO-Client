@@ -1,6 +1,6 @@
 ﻿using MMO_Client.Client.Net.Mines.Event;
 
-namespace MMO_Client.Common
+namespace MMO_Client
 {
     internal class Events
     {

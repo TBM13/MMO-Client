@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using MMO_Client.Common;
 using MMO_Client.Client.Net.Mines.Mobjects;
 using MMO_Client.Client.Net.Mines.IO;
 using MMO_Client.Client.Net.Mines.Event;

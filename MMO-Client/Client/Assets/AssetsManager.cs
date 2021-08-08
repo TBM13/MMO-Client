@@ -4,7 +4,6 @@ using System.IO.Compression;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Newtonsoft.Json.Linq;
-using MMO_Client.Common;
 using System.Windows.Media.Imaging;
 using System;
 

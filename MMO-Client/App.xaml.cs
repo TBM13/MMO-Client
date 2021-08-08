@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Threading;
-using MMO_Client.Common;
 using MMO_Client.Screens;
 using MMO_Client.Client.Assets;
 using MMO_Client.Client.Net;

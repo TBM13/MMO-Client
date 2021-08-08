@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using MMO_Client.Common;
 using MMO_Client.Client.Assets.Controls;
 
 namespace MMO_Client.Client.Assets

@@ -1,5 +1,4 @@
 ﻿using System;
-using MMO_Client.Common;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.Net.Mines.Event;
 using MMO_Client.Client.Net.Mines.Mobjects;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MMO_Client.Common;
 
 namespace MMO_Client.Client.Net.Mines.Mobjects
 {

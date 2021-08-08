@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Media;
 using MMO_Client.Screens;
 
-namespace MMO_Client.Common
+namespace MMO_Client
 {
     internal class Logger
     {

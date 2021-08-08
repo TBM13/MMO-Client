@@ -1,4 +1,4 @@
-﻿namespace MMO_Client.Common
+﻿namespace MMO_Client
 {
     internal abstract class Module
     {

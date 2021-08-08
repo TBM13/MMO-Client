@@ -1,5 +1,4 @@
 ﻿using MMO_Client.Client.Net.Mines.Mobjects;
-using MMO_Client.Common;
 
 namespace MMO_Client.Client.Net.Mines.IO
 {
