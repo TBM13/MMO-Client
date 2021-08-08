@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using MMO_Client.Client.Net.Mines.Mobjects;
 using MMO_Client.Common;
 using MMO_Client.Screens;
 
@@ -23,12 +24,12 @@ namespace MMO_Client.Client.World.Rooms
         public Canvas Canvas { get; init; }
         public Dictionary<int, Dictionary<int, Tile>> TilesMatrix { get; private set; }
 
-        public Room(dynamic roomData)
+        public Room(Mobject mObj)
         {
             CurrentRoom = this;
 
-            Name = roomData.name;
-            ID = roomData.roomId;
+            Name = mObj.Strings["name"];
+            ID = mObj.Integers["id"];
             Logger.Debug($"Creating Room {ID}", Name);
 
             Canvas = new()
@@ -40,13 +41,21 @@ namespace MMO_Client.Client.World.Rooms
             Canvas.SetLeft(Canvas, -190);
             Canvas.SetTop(Canvas, 287);
 
-            Size = new((double)roomData.size[0], (double)roomData.size[1]);
-            CreateTiles(roomData.tiles);
+            Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);
 
-            CreateObjects(roomData.objects);
+            foreach (Mobject mobj in mObj.MobjectArrays["tiles"])
+            {
+                if (mobj.MobjectArrays.ContainsKey("coords"))
+                {
+                    CreateTiles(mobj.MobjectArrays["coords"]);
+                    break;
+                }
+            }
+
+            CreateObjects(mObj.MobjectArrays["sceneObjects"]);
         }
 
-        private void CreateTiles(dynamic tiles)
+        private void CreateTiles(Mobject[] tiles)
         {
             TilesMatrix = new();
 
@@ -55,24 +64,23 @@ namespace MMO_Client.Client.World.Rooms
             for (int i = 0; i < Size.Width; i++)
                 TilesMatrix[i] = new Dictionary<int, Tile>();
 
-            foreach (var obj in tiles)
+            foreach (Mobject obj in tiles)
             {
-                string[] coords = obj.Name.Split(";");
-                int x = int.Parse(coords[0]);
-                int y = int.Parse(coords[1]);
+                int x = obj.IntegerArrays["coord"][0];
+                int y = obj.IntegerArrays["coord"][1];
 
-                Tile tile = new(new Coord(x, y), (bool)obj.Value);
+                Tile tile = new(new Coord(x, y), obj.Booleans["blockingHint"]);
                 TilesMatrix[x][y] = tile;
             }
         }
 
-        private void CreateObjects(dynamic objects)
+        private void CreateObjects(Mobject[] objects)
         {
-            foreach (var obj in objects)
+            foreach (Mobject obj in objects)
             {
-                Coord coord = new((int)obj.coord[0], (int)obj.coord[1]);
-                Size size = new((int)obj.size[0], (int)obj.size[1]);
-                new RoomObject((string)obj.id, (string)obj.name, coord, size,(int)obj.direction, (bool)obj.blockingHint);
+                Coord coord = new(obj.IntegerArrays["coord"][0], obj.IntegerArrays["coord"][1]);
+                Size size = new(obj.IntegerArrays["size"][0], obj.IntegerArrays["size"][1]);
+                _ = new RoomObject(obj.Strings["id"], obj.Strings["name"], coord, size, obj.Integers["direction"], obj.Booleans["blockingHint"]);
             }
         }
     }

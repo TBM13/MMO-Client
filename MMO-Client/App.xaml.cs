@@ -21,6 +21,11 @@ namespace MMO_Client
             new NetworkManager()
         };
 
+        private readonly Module[] restartableModules = new Module[]
+        {
+            new RoomManager()
+        };
+
         void App_Startup(object sender, StartupEventArgs args)
         {
             Application.Current.DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -70,8 +75,6 @@ namespace MMO_Client
             this.username = username;
             loginHash = hash;
 
-            _ = new GameScreen();
-
             NetworkManager.Instance.OnConnect += OnConnect;
             NetworkManager.Instance.Connect("juegosg1395.mundogaturro.com", 9899);
         }
@@ -83,8 +86,10 @@ namespace MMO_Client
 
             Logger.Info($"Connected", "Main");
 
-            _ = new RoomManager();
+            foreach (Module module in restartableModules)
+                module.Initialize();
 
+            _ = new GameScreen();
             NetworkManager.Instance.LoginWithID(username, loginHash);
         }
     }

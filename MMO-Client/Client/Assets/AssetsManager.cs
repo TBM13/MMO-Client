@@ -55,7 +55,7 @@ namespace MMO_Client.Client.Assets
                 path += $@"\{splittedID[i]}";
 
             if (!Directory.Exists(path))
-                return null;
+                return "<<null>>" + path;
 
             return path;
         }
@@ -119,8 +119,9 @@ namespace MMO_Client.Client.Assets
                 Logger.Debug($"Creating image asset {ID}", Name);
 
                 string path = GetAssetPath(ID);
-                if (path == null)
+                if (path.StartsWith("<<null>>"))
                 {
+                    path = path.Remove(0, 8);
                     Directory.CreateDirectory(path);
                     // TODO: Download image asset from server
                 }

@@ -45,7 +45,7 @@ namespace MMO_Client.Client.Assets
                 return;
 
             string path = AssetsManager.GetAssetPath(ID);
-            if (path == null)
+            if (path.StartsWith("<<null>>"))
                 goto error;
 
             int framesCount = Directory.GetFiles(path).Length;

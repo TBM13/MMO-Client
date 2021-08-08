@@ -27,10 +27,10 @@ namespace MMO_Client.Screens
 {
     public partial class GameScreen : Window
     {
-        private static GameScreen instance;
+        public static GameScreen Instance;
 
-        public static double GameWidth { get => instance.canvas.Width; }
-        public static double GameHeight { get => instance.canvas.Height; }
+        public static double GameWidth { get => Instance.canvas.Width; }
+        public static double GameHeight { get => Instance.canvas.Height; }
 
         /// <summary>
         /// The objects look too small in comparison to MG, so we have to multiply their size.
@@ -39,9 +39,17 @@ namespace MMO_Client.Screens
 
         public GameScreen()
         {
-            instance = this;
+            Instance = this;
+
             InitializeComponent();
             Show();
+
+            RoomManager.Instance.OnRoomCreated += OnRoomCreated;
+        }
+
+        private void OnRoomCreated()
+        {
+            canvas.Children.Add(Room.CurrentRoom.Canvas);
         }
     }
 }

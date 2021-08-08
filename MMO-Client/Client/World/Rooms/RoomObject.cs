@@ -61,6 +61,7 @@ namespace MMO_Client.Client.World.Rooms
         /// </summary>
         private void LoadProperties()
         {
+            DrawAsset();
             properties = AssetsManager.GetAssetProperties(Name);
 
             double xCorrection;
@@ -88,15 +89,13 @@ namespace MMO_Client.Client.World.Rooms
 
             Canvas.SetLeft(imageAsset.Image, Canvas.GetLeft(imageAsset.Image) + xCorrection);
             Canvas.SetTop(imageAsset.Image,  Canvas.GetTop(imageAsset.Image)  + yCorrection);
-
-            DrawAsset();
         }
 
         private void DrawAsset()
         {
             Dictionary<string, int> animations = null;
 
-            if (properties.animations != null)
+            if (properties?.animations != null)
             {
                 animations = new();
                 foreach(var obj in properties.animations)

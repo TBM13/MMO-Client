@@ -6,7 +6,7 @@ using System.Windows.Shapes;
 
 namespace MMO_Client.Client.World.Rooms
 {
-    class Tile
+    internal class Tile
     {
         public const double Width = 71 * GameScreen.SizeMultiplier;
         public const double Height = 23 * GameScreen.SizeMultiplier;
