@@ -7,11 +7,9 @@ using System.Windows.Controls;
 
 namespace MMO_Client.Screens
 {
-    public partial class LoginScreen : Window
+    public partial class LoginScreen : UserControl
     {
         internal event Events.String2BoolEvent OnLoginAttempt;
-
-        private const string LogTitle = "Login Screen";
 
         public LoginScreen()
         {
@@ -37,9 +35,6 @@ namespace MMO_Client.Screens
             OnLoginAttempt -= OnLoginEvent;
             LoginProgressbar.Visibility = Visibility.Hidden;
             SavedCredentialsList.IsEnabled = true;
-
-            if (success)
-                Close();
         }
 
         private bool ValidateCredentials()

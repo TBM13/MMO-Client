@@ -1,16 +1,14 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace MMO_Client.Screens
 {
-    public partial class OutputScreen : Window
+    public partial class OutputScreen : UserControl
     {
-        public OutputScreen(string title)
-        {
+        public OutputScreen() => 
             InitializeComponent();
-            Title = title;
-        }
 
         public void AddParagraph(string text, Brush foreColor = null, Brush backColor = null, FontWeight? fontWeight = null)
         {
@@ -46,11 +44,11 @@ namespace MMO_Client.Screens
 
         private void ScrollToEnd()
         {
-            //This checks if scrollbar is at bottom, but when scrollbar is changed to visible not working.
             if (RTB.VerticalOffset + RTB.ViewportHeight < RTB.ExtentHeight) return;
             RTB.ScrollToEnd();
         }
 
+        #region Context Menu
         private void RTBContextMenu_Opened(object sender, RoutedEventArgs e) => 
             CopyMenuItem.IsEnabled = !RTB.Selection.IsEmpty;
 
@@ -59,5 +57,6 @@ namespace MMO_Client.Screens
 
         private void SelectAllMenuItem_Click(object sender, RoutedEventArgs e) => 
             RTB.SelectAll();
+        #endregion
     }
 }
