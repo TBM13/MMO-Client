@@ -18,8 +18,7 @@ namespace MMO_Client.Client.Net
             }
             catch (HttpRequestException e)
             {
-                Logger.Error($"Couldn't download file {url}");
-                Logger.Debug(e.ToString());
+                Logger.Error($"Couldn't download file '{url}' : {e.Message}");
                 OnError?.Invoke(e.ToString());
                 return;
             }
