@@ -252,25 +252,25 @@ namespace MMO_Client.Screens
             int i = SavedCredentialsList.SelectedIndex;
             if (i < 1)
             {
-                Settings.Default.SavedCredentials.Add($"{username};{password}");
+                AppSettings.Default.SavedCredentials.Add($"{username};{password}");
 
                 AddSavedCrendetialsItem(username);
             }
             else
             {
-                Settings.Default.SavedCredentials[i - 1] = $"{username};{password}";
+                AppSettings.Default.SavedCredentials[i - 1] = $"{username};{password}";
                 ((ListViewItem)SavedCredentialsList.Items[i]).Content = username;
             }
 
-            Settings.Default.Save();
+            AppSettings.Default.Save();
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             int i = SavedCredentialsList.SelectedIndex;
 
-            Settings.Default.SavedCredentials.RemoveAt(i - 1);
-            Settings.Default.Save();
+            AppSettings.Default.SavedCredentials.RemoveAt(i - 1);
+            AppSettings.Default.Save();
 
             SavedCredentialsList.Items.RemoveAt(i);
             DeleteButton.IsEnabled = false;
@@ -285,7 +285,7 @@ namespace MMO_Client.Screens
                 return;
             }
 
-            string[] data = Settings.Default.SavedCredentials[i - 1].Split(';');
+            string[] data = AppSettings.Default.SavedCredentials[i - 1].Split(';');
             UsernameBox.Text = data[0];
             PwdBox.Password = data[1];
 
@@ -294,7 +294,7 @@ namespace MMO_Client.Screens
 
         private void PopulateSavedCredentialsList()
         {
-            foreach (string s in Settings.Default.SavedCredentials)
+            foreach (string s in AppSettings.Default.SavedCredentials)
                 AddSavedCrendetialsItem(s.Split(';')[0]);
         }
 
