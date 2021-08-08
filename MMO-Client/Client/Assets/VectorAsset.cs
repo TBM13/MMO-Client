@@ -70,13 +70,13 @@ namespace MMO_Client.Client.Assets
         {
             if (PlayingAnimation)
             {
-                Logger.Warn("Animation is already playing", ID);
+                Logger.Warn("Animation is already playing", false, ID);
                 return;
             }
 
             if (Frames == null)
             {
-                Logger.Warn("No animation frames provided", ID);
+                Logger.Warn("No animation frames provided", false, ID);
                 return;
             }
 

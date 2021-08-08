@@ -29,7 +29,7 @@ namespace MMO_Client.Client.World.Rooms
 
             Name = mObj.Strings["name"];
             ID = mObj.Integers["id"];
-            Logger.Debug($"Creating Room {ID}", Name);
+            Logger.Debug($"Creating Room {ID}");
 
             Canvas = new()
             {

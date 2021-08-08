@@ -6,7 +6,7 @@ using MMO_Client.Client.Net.Requests;
 
 namespace MMO_Client.Client.Net
 {
-    internal class NetworkManager : Module
+    internal class NetworkManager
     {
         public static NetworkManager Instance;
 
@@ -70,9 +70,7 @@ namespace MMO_Client.Client.Net
         private string preff;
         private int counter = 0;
 
-        public override string Name { get; } = "Network Manager";
-
-        public override void Initialize()
+        public NetworkManager()
         {
             Instance = this;
 
@@ -80,18 +78,15 @@ namespace MMO_Client.Client.Net
             MinesServer.Instance.OnLogout += (MinesEvent ev) => OnLogout?.Invoke(ev);
             MinesServer.Instance.OnMessage += HandleMamboEvent;
 
-            Logger.Info("Initialized", Name);
+            Logger.Info("Initialized");
 
 #if NetworkDebug
-            Logger.Debug("Network Debug is enabled", Name);
+            Logger.Debug("Network Debug is enabled");
 #endif
 #if NetworkDebugVerbose
             Logger.Debug("Verbose Network Debug is enabled", Name);
 #endif
         }
-
-        public override void Terminate() => 
-            Logger.Info("Terminated", Name);
 
         public void Connect(string host, int port) =>
             MinesServer.Instance.Connect(host, port);
@@ -99,7 +94,7 @@ namespace MMO_Client.Client.Net
         public void SendMobject(Mobject mObj)
         {
 #if NetworkDebug
-            Logger.Debug($"Sending Action {mObj.Strings["request"]}", Name);
+            Logger.Debug($"Sending Action {mObj.Strings["request"]}");
 #endif
 
             OnActionSent?.Invoke(new MinesEvent(true, "<empty>", mObj));
@@ -130,10 +125,10 @@ namespace MMO_Client.Client.Net
             string type = mEvent.Mobject.Strings["type"];
 
             if (!mEvent.Success)
-                Logger.Warn($"Received a failing \"{type}\". Error Code: {mEvent.ErrorCode}", Name);
+                Logger.Warn($"Received a failing \"{type}\". Error Code: {mEvent.ErrorCode}");
 #if NetworkDebug
             else
-                Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})", Name);
+                Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})");
 #endif
 
             switch (type)
@@ -247,7 +242,7 @@ namespace MMO_Client.Client.Net
                     OnAddedToInventory?.Invoke(mEvent);
                     break;
                 default:
-                    Logger.Error($"Unhandled Mambo Event {type}", Name);
+                    Logger.Error($"Unhandled Mambo Event {type}");
                     break;
             }
         }

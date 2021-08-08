@@ -11,10 +11,9 @@ namespace MMO_Client.Client.Net.Mines
     /// <summary>
     /// The Mines Server Module is responsible for the client-server communication.
     /// </summary>
-    internal class MinesServer : Module
+    internal class MinesServer
     {
         public static MinesServer Instance;
-        public override string Name { get; } = "Mines";
 
         public Events.Mines1Event OnConnect;
         public Events.Mines1Event OnLogout;
@@ -24,19 +23,11 @@ namespace MMO_Client.Client.Net.Mines
 
         private Message pendingMessage;
 
-        public override void Initialize()
+        public MinesServer()
         {
             Instance = this;
 
-            Logger.Info("Initialized", Name);
-        }
-
-        public override void Terminate()
-        {
-            socket.Shutdown(SocketShutdown.Both);
-            socket.Close();
-
-            Logger.Info("Terminated", Name);
+            Logger.Info("Initialized");
         }
 
         /// <summary>
@@ -46,7 +37,7 @@ namespace MMO_Client.Client.Net.Mines
         {
             try
             {
-                Logger.Info($"Connecting to {host}:{port}", Name);
+                Logger.Info($"Connecting to {host}:{port}");
                 socket.Connect(host, port);
 
                 if (socket.Connected)
@@ -61,8 +52,8 @@ namespace MMO_Client.Client.Net.Mines
             }
             catch (Exception e)
             {
-                Logger.Error($"Error while connecting to {host}:{port}", Name);
-                Logger.Error(e.ToString(), Name);
+                Logger.Error($"Error while connecting to {host}:{port}");
+                Logger.Error(e.ToString());
 
                 OnConnect?.Invoke(new MinesEvent(false, "0", null));
             }
@@ -140,7 +131,7 @@ namespace MMO_Client.Client.Net.Mines
                 HandleSocketData(buffer);
             }
             else
-                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", Name, true);
+                Logger.Warn("ReceiveCallback: bytesRead is 0 !!!", true);
         }
 
         private void HandleSocketData(byte[] data)
@@ -153,7 +144,7 @@ namespace MMO_Client.Client.Net.Mines
                 int header = byteArray.ReadByte();
                 if (header != Message.HEADER_TYPE)
                 {
-                    Logger.Error($"Unknown Header {(char)header} [{header}]", Name, true);
+                    Logger.Error($"Unknown Header {(char)header} [{header}]", true);
                     return;
                 }
 
@@ -205,14 +196,14 @@ namespace MMO_Client.Client.Net.Mines
                     break;
                 case "login":
                     //OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
-                    Logger.Debug("Login!!!", Name, true);
+                    Logger.Debug("Login!!!", true);
                     break;
                 case "logout":
                     OnLogout?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings["errorCode"], mObj.Mobjects["mobject"]));
-                    Logger.Debug("Logout!!!", Name, true);
+                    Logger.Debug("Logout!!!", true);
                     break;
                 default:
-                    Logger.Error($"Unknown Message Type \"{mObj.Strings["type"]}\"", Name, true);
+                    Logger.Error($"Unknown Message Type \"{mObj.Strings["type"]}\"", true);
                     break;
             }
         }

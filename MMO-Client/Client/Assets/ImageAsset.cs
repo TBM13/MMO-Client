@@ -129,7 +129,7 @@ namespace MMO_Client.Client.Assets
 
         error:
             IsBroken = true;
-            Logger.Error("Couldn't load image asset", ID);
+            Logger.Error("Couldn't load image asset", false, ID);
 
             Image.Width = ErrorBitmapImage.Width;
             Image.Height = ErrorBitmapImage.Height;
@@ -163,7 +163,7 @@ namespace MMO_Client.Client.Assets
                 }
             }
 
-            Logger.Error($"Invalid Frame {frame}", ID);
+            Logger.Error($"Invalid Frame {frame}", false, ID);
             Draw(ErrorBitmapImage);
         }
 
@@ -179,19 +179,19 @@ namespace MMO_Client.Client.Assets
 
             if (PlayingAnimation)
             {
-                Logger.Warn("Animation is already playing", ID);
+                Logger.Warn("Animation is already playing", false, ID);
                 return;
             }
 
             if (Frames == null)
             {
-                Logger.Error("No animation frames loaded", ID);
+                Logger.Error("No animation frames loaded", false, ID);
                 return;
             }
 
             if (!Frames.ContainsKey(name) || Frames[name].Count <= 1)
             {
-                Logger.Error($"Animation {name} doesn't contain any frames or only contains one", ID);
+                Logger.Error($"Animation {name} doesn't contain any frames or only contains one", false, ID);
                 return;
             }
 

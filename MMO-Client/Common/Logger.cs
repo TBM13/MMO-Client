@@ -27,7 +27,7 @@ namespace MMO_Client
             outputScreen.AppendText(text2, textColor, backColor, fontWeight);
         }
 
-        public static void Info(string text, [CallerFilePath] string title = "", bool bold = false)
+        public static void Info(string text, bool bold = false, [CallerFilePath] string title = "")
         {
             if (title.Contains("\\"))
                 title = GetCaller(title);
@@ -35,7 +35,7 @@ namespace MMO_Client
             instance.Write(title, text, Brushes.Blue, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
         }
 
-        public static void Warn(string text, [CallerFilePath] string title = "", bool bold = false)
+        public static void Warn(string text, bool bold = false, [CallerFilePath] string title = "")
         {
             if (title.Contains("\\"))
                 title = GetCaller(title);
@@ -43,7 +43,7 @@ namespace MMO_Client
             instance.Write(title, text, Brushes.Orange, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
         }
 
-        public static void Error(string text, [CallerFilePath] string title = "", bool bold = false)
+        public static void Error(string text, bool bold = false, [CallerFilePath] string title = "")
         {
             if (title.Contains("\\"))
                 title = GetCaller(title);
@@ -59,7 +59,7 @@ namespace MMO_Client
             instance.Write(title, text, Brushes.White, Brushes.White, Brushes.Red, FontWeights.Bold);
         }
 
-        public static void Debug(string text, [CallerFilePath] string title = "", bool bold = false)
+        public static void Debug(string text, bool bold = false, [CallerFilePath] string title = "")
         {
 #if DEBUG
             if (title.Contains("\\"))

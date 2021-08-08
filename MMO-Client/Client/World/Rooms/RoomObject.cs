@@ -68,7 +68,7 @@ namespace MMO_Client.Client.World.Rooms
 
             if (properties == null)
             {
-                Logger.Warn($"Object doesn't have any properties. Position in room may be inaccurate!", Name);
+                Logger.Warn($"Object doesn't have any properties. Position in room may be inaccurate!", false, Name);
 
                 // Try an alternative method to position the object
                 // It's very inaccurate, but better than nothing

@@ -108,7 +108,7 @@ namespace MMO_Client.Client.Net.Mines.IO
 
                     break;
                 default:
-                    Logger.Error($"Unable to write Mobject data! Unknown DataType {mData.DataType}", "Mines Output Stream", true);
+                    Logger.Error($"Unable to write Mobject data! Unknown DataType {mData.DataType}", true);
                     break;
             }
 

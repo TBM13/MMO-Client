@@ -24,7 +24,7 @@ namespace MMO_Client.Client.Net.Mines
             if (length == 0) // From AS3 Socket Documentation: The default value of 0 causes all available data to be read.
             {
                 length = byteArray.Bytes.Count - byteArray.ReadPosition;
-                Logger.Debug("Length is 0!", "Mines Message", true);
+                Logger.Debug("Length is 0!", true);
             }
 
             mis.WriteBytes(byteArray.ReadBytes(length), 0, length);
@@ -39,7 +39,7 @@ namespace MMO_Client.Client.Net.Mines
         public bool IsComplete()
         {
             if (Payload < mis.Bytes.Count)
-                Logger.Error($"Payload is wrong! payload: {Payload}, MIS Length: {mis.Bytes.Count}", "Mines Message", true);
+                Logger.Error($"Payload is wrong! payload: {Payload}, MIS Length: {mis.Bytes.Count}", true);
 
             return Payload == mis.Bytes.Count;
         }
