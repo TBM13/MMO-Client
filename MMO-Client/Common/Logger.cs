@@ -27,23 +27,55 @@ namespace MMO_Client.Common
             outputScreen.AppendText(text2, textColor, backColor, fontWeight);
         }
 
-        public static void Info(string text, [CallerMemberName]string methodName = "", bool bold = false) =>
-            instance.Write(methodName, text, Brushes.Blue, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+        public static void Info(string text, [CallerFilePath] string title = "", bool bold = false)
+        {
+            if (title.Contains("\\"))
+                title = GetCaller(title);
 
-        public static void Warn(string text, [CallerMemberName]string methodName = "", bool bold = false) =>
-            instance.Write(methodName, text, Brushes.Orange, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+            instance.Write(title, text, Brushes.Blue, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+        }
 
-        public static void Error(string text, [CallerMemberName]string methodName = "", bool bold = false) =>
-            instance.Write(methodName, text, Brushes.Red, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+        public static void Warn(string text, [CallerFilePath] string title = "", bool bold = false)
+        {
+            if (title.Contains("\\"))
+                title = GetCaller(title);
 
-        public static void Fatal(string text, [CallerMemberName]string methodName = "") =>
-            instance.Write(methodName, text, Brushes.White, Brushes.White, Brushes.Red, FontWeights.Bold);
+            instance.Write(title, text, Brushes.Orange, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+        }
 
-        public static void Debug(string text, [CallerMemberName]string methodName = "", bool bold = false)
+        public static void Error(string text, [CallerFilePath] string title = "", bool bold = false)
+        {
+            if (title.Contains("\\"))
+                title = GetCaller(title);
+
+            instance.Write(title, text, Brushes.Red, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+        }
+
+        public static void Fatal(string text, [CallerFilePath] string title = "")
+        {
+            if (title.Contains("\\"))
+                title = GetCaller(title);
+
+            instance.Write(title, text, Brushes.White, Brushes.White, Brushes.Red, FontWeights.Bold);
+        }
+
+        public static void Debug(string text, [CallerFilePath] string title = "", bool bold = false)
         {
 #if DEBUG
-            instance.Write(methodName, text, Brushes.LimeGreen, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
+            if (title.Contains("\\"))
+                title = GetCaller(title);
+
+            instance.Write(title, text, Brushes.LimeGreen, Brushes.Black, Brushes.White, bold ? FontWeights.Bold : FontWeights.Regular);
 #endif
+        }
+
+        private static string GetCaller(string path)
+        {
+            path = path.Remove(0, path.LastIndexOf("\\") + 1);
+            int i = path.IndexOf(".");
+            path = path.Remove(i, path.Length - i);
+
+            return path;
         }
     }
 }
