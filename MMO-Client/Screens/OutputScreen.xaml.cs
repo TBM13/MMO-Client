@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -12,6 +13,15 @@ namespace MMO_Client.Screens
 
         public void AddParagraph(string text, Brush foreColor = null, Brush backColor = null, FontWeight? fontWeight = null)
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(new Action(delegate
+                {
+                    AddParagraph(text, foreColor, backColor, fontWeight);
+                }));
+                return;
+            }
+
             Paragraph paragraph = new();
             Run run = new(text)
             {
@@ -28,6 +38,15 @@ namespace MMO_Client.Screens
 
         public void AppendText(string text, Brush foreColor = null, Brush backColor = null, FontWeight? fontWeight = null)
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(new Action(delegate
+                {
+                    AppendText(text, foreColor, backColor, fontWeight);
+                }));
+                return;
+            }
+
             Paragraph paragraph = (Paragraph)RTB.Document.Blocks.LastBlock;
             Run run = new(text)
             {
