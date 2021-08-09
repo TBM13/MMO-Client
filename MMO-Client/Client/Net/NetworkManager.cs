@@ -86,9 +86,6 @@ namespace MMO_Client.Client.Net
 #endif
         }
 
-        public void Connect(string host, int port) =>
-            MinesServer.Instance.Connect(host, port);
-
         public void SendMobject(Mobject mObj)
         {
 #if NetworkDebug
@@ -108,9 +105,6 @@ namespace MMO_Client.Client.Net
 
             OnUniqueActionSent?.Invoke(new MinesEvent(true, "<empty>", mObj));
         }
-
-        public void LoginWithID(string username, string hash) =>
-            MinesServer.Instance.LoginWithID(username, hash);
 
         private string GenerateID()
         {

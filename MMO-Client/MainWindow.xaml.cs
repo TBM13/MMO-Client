@@ -1,4 +1,8 @@
-﻿using MMO_Client.Client.Config;
+﻿using MMO_Client.Client.Assets;
+using MMO_Client.Client.Config;
+using MMO_Client.Client.Net;
+using MMO_Client.Client.Net.Mines;
+using MMO_Client.Client.World.Rooms;
 using MMO_Client.Screens;
 using System.Windows;
 
@@ -6,6 +10,9 @@ namespace MMO_Client
 {
     public partial class MainWindow : Window
     {
+        private string username;
+        private string loginId;
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -29,6 +36,9 @@ namespace MMO_Client
             if (!success)
                 return;
 
+            this.username = username;
+            this.loginId = loginId;
+
             LoginScreen.OnLoginAttempt -= OnLoginAttempt;
             LoginScreen.Visibility = Visibility.Hidden;
 
@@ -43,8 +53,6 @@ namespace MMO_Client
 
             LoadScreen.OnRetryClick = null;
             LoadScreen.OnRetryClick += LoadGameSettings;
-
-            LoadScreen.ResetProgressbar();
 
             Settings.Instance.OnSettingsLoaded += (success) =>
             {
@@ -69,8 +77,6 @@ namespace MMO_Client
             LoadScreen.OnRetryClick = null;
             LoadScreen.OnRetryClick += LoadGameplaySettings;
 
-            LoadScreen.ResetProgressbar();
-
             Settings.Instance.OnSettingsLoaded += (success) =>
             {
                 Settings.Instance.OnSettingsLoaded = null;
@@ -81,19 +87,73 @@ namespace MMO_Client
                 }
 
                 LoadScreen.Visibility = Visibility.Hidden;
-
-                ServersScreen.OnServerSelected += OnServerSelected;
-                ServersScreen.Visibility = Visibility.Visible;
-                ServersScreen.LoadServers();
+                SetupGame();
             };
 
             Settings.Instance.LoadGameplaySettings();
+        }
+
+        private void SetupGame()
+        {
+            // Assets
+            _ = new AssetsManager();
+
+            // Network
+            _ = new MinesServer();
+            _ = new NetworkManager();
+
+            // World
+            _ = new RoomManager();
+
+            ShowServersList();
+        }
+
+        private void ShowServersList()
+        {
+            ServersScreen.OnServerSelected += OnServerSelected;
+            ServersScreen.Visibility = Visibility.Visible;
+            ServersScreen.LoadServers();
         }
 
         private void OnServerSelected(string host, string port)
         {
             ServersScreen.OnServerSelected -= OnServerSelected;
             ServersScreen.Visibility = Visibility.Hidden;
+
+            LoadScreen.Visibility = Visibility.Visible;
+            Connect(host, port);
+        }
+
+        private void Connect(string host, string port)
+        {
+            LoadScreen.ResetProgressbar();
+            LoadScreen.LabelText = $"Connecting to {host}:{port}";
+
+            void retry() =>
+                ShowServersList();
+
+            LoadScreen.OnRetryClick = null;
+            LoadScreen.OnRetryClick += retry;
+
+            MinesServer.Instance.OnConnect += OnMinesConnect;
+            MinesServer.Instance.Connect(host, int.Parse(port) + 1);
+        }
+
+        private void OnMinesConnect(MinesEvent mEvent)
+        {
+            MinesServer.Instance.OnConnect -= OnMinesConnect;
+
+            if (!mEvent.Success)
+            {
+                LoadScreen.ShowError("Couldn't connect to server", true);
+                return;
+            }
+
+            LoadScreen.Visibility = Visibility.Hidden;
+            GameScreen.Visibility = Visibility.Visible;
+            GameScreen.Setup();
+
+            MinesServer.Instance.LoginWithID(username, loginId);
         }
     }
 }

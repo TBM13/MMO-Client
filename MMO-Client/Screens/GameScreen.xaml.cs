@@ -19,7 +19,10 @@ namespace MMO_Client.Screens
         {
             Instance = this;
             InitializeComponent();
+        }
 
+        public void Setup()
+        {
             RoomManager.Instance.OnRoomCreated += OnRoomCreated;
         }
 
