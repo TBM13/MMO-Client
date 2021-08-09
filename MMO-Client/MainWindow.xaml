@@ -15,13 +15,11 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <screens:OutputScreen x:Name="LoggerOutput"/>
         <screens:LoginScreen x:Name="LoginScreen" Grid.Column="1"/>
-
         <screens:LoadScreen x:Name="LoadScreen" Grid.Column="1" Visibility="Hidden"/>
-        
         <screens:ServersScreen x:Name="ServersScreen" Grid.Column="1" Visibility="Hidden"/>
-        
         <screens:GameScreen x:Name="GameScreen" Grid.Column="1" Visibility="Hidden"/>
+        
+        <screens:OutputScreen x:Name="LoggerOutput"/>
     </Grid>
 </Window>
