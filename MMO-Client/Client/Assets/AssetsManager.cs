@@ -12,7 +12,7 @@ namespace MMO_Client.Client.Assets
     /// <summary>
     /// The Assets Manager is responsible for loading and caching assets.
     /// </summary>
-    class AssetsManager
+    internal class AssetsManager
     {
         public static AssetsManager Instance;
         public const string AssetsPath = @".\Assets";
@@ -36,8 +36,6 @@ namespace MMO_Client.Client.Assets
             errorImg.CacheOption = BitmapCacheOption.OnLoad;
             errorImg.EndInit();
             ImageAsset.ErrorBitmapImage = errorImg;
-
-            Logger.Info("Initialized");
         }
 
         public static string GetAssetPath(string ID)

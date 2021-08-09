@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -7,13 +6,13 @@ using System.Windows.Media.Imaging;
 
 namespace MMO_Client.Client.Assets
 {
-    class ImageAsset : Asset
+    internal class ImageAsset : Asset
     {
         public static BitmapImage ErrorBitmapImage { get; set; }
 
         public Image Image { get; init; }
 
-        public Dictionary<string, List<BitmapImage>> Frames { get; private set; } = null;
+        public Dictionary<string, List<BitmapImage>> Frames { get; private set; }
         public int Framerate { get; set; } = 24;
         public bool Loop { get; set; }
         public bool PlayingAnimation { get; private set; }

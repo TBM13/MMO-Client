@@ -6,13 +6,13 @@ using MMO_Client.Client.Assets.Controls;
 
 namespace MMO_Client.Client.Assets
 {
-    class VectorAsset : Asset
+    internal class VectorAsset : Asset
     {
         public CustomSvgViewbox Viewbox { get; init; }
-        public DrawingGroup InitialDrawing { get; private set; } = null;
-        public DrawingGroup LastDrawnDrawing { get; private set; } = null;
+        public DrawingGroup InitialDrawing { get; private set; }
+        public DrawingGroup LastDrawnDrawing { get; private set; }
 
-        public List<DrawingGroup> Frames { get; private set; } = null;
+        public List<DrawingGroup> Frames { get; private set; }
         public int FPS { get; set; } = 24;
         public bool Loop { get; set; }
         public bool PlayingAnimation { get; private set; }

@@ -47,7 +47,7 @@ namespace MMO_Client.Client.World.Rooms
             double xPos = Coord.X * Tile.Width;
             Canvas.SetLeft(imageAsset.Image, xPos);
 
-            double yPos = Coord.Y * Tile.Height - 6; // Why do we need to decrease 6? I don't know
+            double yPos = (Coord.Y * Tile.Height) - 6; // Why do we need to decrease 6? I don't know
             Canvas.SetTop(imageAsset.Image, yPos);
 
             // Cancel the 3D perspective of the image
@@ -72,8 +72,8 @@ namespace MMO_Client.Client.World.Rooms
 
                 // Try an alternative method to position the object
                 // It's very inaccurate, but better than nothing
-                yCorrection = -(imageAsset.Image.Height - Tile.Height / 2);
-                xCorrection = -(imageAsset.Image.Width - Tile.Width / 1.5) + yCorrection;
+                yCorrection = -(imageAsset.Image.Height - (Tile.Height / 2));
+                xCorrection = -(imageAsset.Image.Width - (Tile.Width / 1.5)) + yCorrection;
 
                 xCorrection /= Size.Width;
                 yCorrection /= Size.Height;
