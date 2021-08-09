@@ -10,6 +10,9 @@ namespace MMO_Client
 {
     public partial class MainWindow : Window
     {
+        // Temp solution to store username
+        public static string Username { get; private set; }
+        
         private string username;
         private string loginId;
         
@@ -36,6 +39,7 @@ namespace MMO_Client
             if (!success)
                 return;
 
+            Username = username;
             this.username = username;
             this.loginId = loginId;
 
