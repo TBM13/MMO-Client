@@ -9,7 +9,7 @@ namespace MMO_Client.Client.Net.Mines
 {
     internal class MinesServer
     {
-        public static MinesServer Instance;
+        public static MinesServer Instance { get; private set; }
         public Events.Mines1Event OnConnect;
         public Events.Mines1Event OnLogin;
         public Events.Mines1Event OnLogout;
@@ -43,15 +43,17 @@ namespace MMO_Client.Client.Net.Mines
         /// <summary>
         /// Connects the socket to the specified host and starts the read loop if the connection was successful.
         /// </summary>
-        public void Connect(string host, int port)
+        public async void Connect(string host, int port)
         {
             try
             {
                 Logger.Info($"Connecting to {host}:{port}");
-                socket.Connect(host, port);
+                await socket.ConnectAsync(host, port);
 
                 if (socket.Connected)
                 {
+                    Logger.Info("Connected!");
+                    
                     Host = host;
                     Port = port;
                     OnConnect?.Invoke(new MinesEvent(true, null, null));
@@ -280,7 +282,7 @@ namespace MMO_Client.Client.Net.Mines
         public void LoginWithID(string username, string hash)
         {
             Mobject mobj = new();
-            mobj.Strings["size"] = "5371953";
+            mobj.Strings["size"] = "4814707";
             mobj.Strings["hash"] = hash;
             mobj.Strings["type"] = "login";
             mobj.Strings["check"] = "haha";
