@@ -36,8 +36,6 @@ namespace MMO_Client.Client.Net.Mines
 
             pendingBytes.RemoveOnRead = true;
             msgProcessingThread = new Thread(ProcessMessage);
-
-            Logger.Info("Initialized");
         }
 
         /// <summary>

@@ -2,12 +2,15 @@
 using System.Windows;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.Net.Requests;
+using MMO_Client.Client.Net.Security;
 
 namespace MMO_Client.Client.Net
 {
     internal class NetworkManager
     {
         public static NetworkManager Instance;
+
+        public SecurityMethod SecurityMethod { get; private set; }
 
         #region events
         public Events.Mines1Event OnBuddyAdded;
@@ -70,9 +73,8 @@ namespace MMO_Client.Client.Net
         {
             Instance = this;
 
+            MinesServer.Instance.OnLogin += OnMineslogin;
             MinesServer.Instance.OnMessage += InvokeHandleMamboEvent;
-
-            Logger.Info("Initialized");
 
 #if NetworkDebug
             Logger.Debug("Network Debug is enabled");
@@ -82,24 +84,38 @@ namespace MMO_Client.Client.Net
 #endif
         }
 
-        public void SendMobject(Mobject mObj)
+        private void OnMineslogin(MinesEvent mEvent)
         {
-#if NetworkDebug
-            Logger.Debug($"Sending Action {mObj.Strings["request"]}");
-#endif
+            if (!mEvent.Success)
+                return;
 
-            OnActionSent?.Invoke(new MinesEvent(true, "<empty>", mObj));
-            MinesServer.Instance.SendMobject(mObj);
+            MinesServer.Instance.OnLogin -= OnMineslogin;
+            SecurityMethod = new(mEvent.Mobject.Strings["key"]);
+
+            Logger.Info("Server confirmed successful login");
         }
 
         public void SendAction(MamboRequest request)
         {
-            Mobject mObj = request.ToMobject();
-            mObj.Strings["request"] = request.Type;
-            mObj.Strings["messageId"] = GenerateID();
-            SendMobject(mObj);
+            Mobject mobj = request.ToMobject();
+            if (mobj == null)
+            {
+                Logger.Warn("Can't send a null action");
+                return;
+            }
 
-            OnUniqueActionSent?.Invoke(new MinesEvent(true, "<empty>", mObj));
+#if NetworkDebug
+            Logger.Debug($"Sending action {mobj.Strings["request"]}");
+#endif
+
+            mobj.Strings["request"] = request.Type;
+            mobj.Strings["messageId"] = GenerateID();
+            SendMobject(mobj);
+        }
+
+        public void SendMobject(Mobject mobj)
+        {
+            MinesServer.Instance.SendMobject(mobj);
         }
 
         private string GenerateID()

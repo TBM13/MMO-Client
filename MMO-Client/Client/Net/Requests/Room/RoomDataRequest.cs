@@ -1,8 +1,12 @@
-﻿namespace MMO_Client.Client.Net.Requests.Room
+﻿using MMO_Client.Client.Net.Mines;
+
+namespace MMO_Client.Client.Net.Requests.Room
 {
-    class RoomDataRequest : MamboRequest
+    internal class RoomDataRequest : MamboRequest
     {
-        public RoomDataRequest(string type = "RoomDataRequest") =>
-            Type = type;
+        public RoomDataRequest() : base("RoomDataRequest") { }
+
+        public override Mobject Build() => 
+            new Mobject();
     }
 }

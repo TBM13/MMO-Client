@@ -2,22 +2,20 @@
 
 namespace MMO_Client.Client.Net.Requests
 {
-    class MamboRequest
+    internal class MamboRequest
     {
-        public string Type { get; set; }
+        public string Type { get; private set; }
 
-        public MamboRequest(string type = null) => 
+        public MamboRequest(string type) =>
             Type = type;
 
-        public Mobject ToMobject()
+        public Mobject ToMobject() =>
+            Build();
+
+        public virtual Mobject Build()
         {
-            Mobject mObj = new();
-            mObj = Build(mObj);
-
-            return mObj;
+            Logger.Error("Not implemented!", false, Type);
+            return null;
         }
-
-        public virtual Mobject Build(Mobject mObj) => 
-            mObj;
     }
 }

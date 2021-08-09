@@ -20,8 +20,6 @@ namespace MMO_Client.Client.World.Rooms
 
             NetworkManager.Instance.OnRoomData += OnRoomData;
             NetworkManager.Instance.OnAvatarJoins += OnAvatarJoins;
-
-            Logger.Info("Initialized");
         }
 
         public void LoadRoomData() => 
@@ -30,7 +28,7 @@ namespace MMO_Client.Client.World.Rooms
         private void OnAvatarJoins(MinesEvent mEvent)
         {
             NetworkManager.Instance.OnAvatarJoins -= OnAvatarJoins;
-            LoadRoomData();
+            //LoadRoomData();
         }
 
         private void OnRoomData(MinesEvent mEvent)
