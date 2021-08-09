@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="White">
-        <ListView x:Name="List" Margin="25" HorizontalContentAlignment="Stretch"/>
+        <ListView x:Name="List" Margin="25" HorizontalContentAlignment="Stretch" SelectionMode="Single" KeyDown="List_KeyDown"/>
         <Button x:Name="Refresh" HorizontalAlignment="Right" VerticalAlignment="Bottom" Content="Refresh" Width="65" Margin="3" Click="Refresh_Click"/>
         <local:LoadScreen x:Name="LoadScreen"/>
     </Grid>

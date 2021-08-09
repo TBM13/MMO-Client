@@ -103,6 +103,15 @@ namespace MMO_Client.Screens
             List.Items.Add(grid);
         }
 
+        private void List_KeyDown(object sender, KeyEventArgs e)
+        {
+            int i = List.SelectedIndex;
+            if (i == -1)
+                return;
+
+            OnServerSelected?.Invoke(servers[i].Host, servers[i].Port);
+        }
+
         private void Refresh_Click(object sender, RoutedEventArgs e) =>
             LoadServers();
     }
