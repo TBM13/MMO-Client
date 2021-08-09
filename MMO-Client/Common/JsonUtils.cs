@@ -5,6 +5,21 @@ namespace MMO_Client
 {
     internal static class JsonUtils
     {
+        public static dynamic[] ParseJsonArray(string data)
+        {
+            JsonSerializerOptions options = new()
+            {
+                ReadCommentHandling = JsonCommentHandling.Skip
+            };
+
+            dynamic[] array = JsonSerializer.Deserialize<dynamic[]>(data, options);
+
+            for (int i = 0; i < array.Length; i++)
+                array[i] = ParseJsonElement(array[i]);
+
+            return array;
+        }
+        
         public static Dictionary<string, dynamic> ParseJsonDictionary(string data)
         {
             JsonSerializerOptions options = new()

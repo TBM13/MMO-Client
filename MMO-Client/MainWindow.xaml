@@ -19,5 +19,7 @@
         <screens:LoginScreen x:Name="LoginScreen" Grid.Column="1"/>
 
         <screens:LoadScreen x:Name="LoadScreen" Grid.Column="1" Visibility="Hidden"/>
+        
+        <screens:ServersScreen x:Name="ServersScreen" Grid.Column="1" Visibility="Hidden"/>
     </Grid>
 </Window>

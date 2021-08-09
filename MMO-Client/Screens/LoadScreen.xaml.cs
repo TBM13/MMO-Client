@@ -20,7 +20,7 @@ namespace MMO_Client.Screens
             LoadProgressbar.Visibility = Visibility.Visible;
             LoadProgressbar.Value = 0;
             LoadProgressbar.IsIndeterminate = true;
-            LoadProgressbar.Foreground = (Brush)new BrushConverter().ConvertFromString("#FF06B025");
+            LoadProgressbar.Foreground = Utils.BrushFromHex("#FF06B025");
         }
 
         public void ShowError(string errorMsg, bool showRetryButton)

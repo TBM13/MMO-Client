@@ -81,9 +81,19 @@ namespace MMO_Client
                 }
 
                 LoadScreen.Visibility = Visibility.Hidden;
+
+                ServersScreen.OnServerSelected += OnServerSelected;
+                ServersScreen.Visibility = Visibility.Visible;
+                ServersScreen.LoadServers();
             };
 
             Settings.Instance.LoadGameplaySettings();
+        }
+
+        private void OnServerSelected(string host, string port)
+        {
+            ServersScreen.OnServerSelected -= OnServerSelected;
+            ServersScreen.Visibility = Visibility.Hidden;
         }
     }
 }
