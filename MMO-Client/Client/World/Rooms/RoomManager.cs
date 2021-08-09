@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MMO_Client.Client.Net;
-using MMO_Client.Client.Net.Mines.Event;
+using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.Net.Requests.Room;
 
 namespace MMO_Client.Client.World.Rooms

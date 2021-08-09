@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using MMO_Client.Client.Net.Mines.Mobjects;
+using MMO_Client.Client.Net.Mines;
 using MMO_Client.Screens;
 
 namespace MMO_Client.Client.World.Rooms

@@ -1,20 +1,20 @@
-﻿namespace MMO_Client.Client.Net.Mines.Mobjects
+﻿namespace MMO_Client.Client.Net.Mines
 {
-    class MobjectData
+    internal class MobjectData
     {
         public string Key { get; init; }
         public dynamic Value { get; init; }
-        public int DataType { get; init; }
+        public MobjectDataType DataType { get; init; }
 
-        public MobjectData(string key, dynamic value, int type)
+        public MobjectData(string key, dynamic value, MobjectDataType type)
         {
             Key = key;
             Value = value;
             DataType = type;
         }
 
-        public override string ToString()
-            => $"<{Key}:{DataType}={GetValueAsString()}>";
+        public override string ToString()=> 
+            $"<{Key}:{DataType}={GetValueAsString()}>";
 
         /// <summary>
         /// Returns Value converted to a string. 
@@ -22,7 +22,7 @@
         /// </summary>
         public string GetValueAsString(int depth = 0)
         {
-            switch(DataType)
+            switch (DataType)
             {
                 case MobjectDataType.BOOLEAN_ARRAY:
                 case MobjectDataType.FLOAT_ARRAY:
@@ -61,7 +61,7 @@
                     if (Value is float)
                         v = v.Replace(',', '.');
                     else if (Value is bool)
-                        v = v.ToLower();
+                        v = v.ToLowerInvariant();
 
                     return v;
             }

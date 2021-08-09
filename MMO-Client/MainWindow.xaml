@@ -21,5 +21,7 @@
         <screens:LoadScreen x:Name="LoadScreen" Grid.Column="1" Visibility="Hidden"/>
         
         <screens:ServersScreen x:Name="ServersScreen" Grid.Column="1" Visibility="Hidden"/>
+        
+        <screens:GameScreen x:Name="GameScreen" Grid.Column="1" Visibility="Hidden"/>
     </Grid>
 </Window>

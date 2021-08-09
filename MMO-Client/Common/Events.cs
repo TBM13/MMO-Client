@@ -1,4 +1,4 @@
-﻿using MMO_Client.Client.Net.Mines.Event;
+﻿using MMO_Client.Client.Net.Mines;
 
 namespace MMO_Client
 {

@@ -1,6 +1,4 @@
-﻿using MMO_Client.Client.Net.Mines.Mobjects;
-
-namespace MMO_Client.Client.Net.Mines.Event
+﻿namespace MMO_Client.Client.Net.Mines
 {
     internal class MinesEvent
     {

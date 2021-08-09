@@ -1,33 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using SharpVectors.Converters;
-using SharpVectors.Renderers.Wpf;
-using MMO_Client.Client.Assets;
-using MMO_Client.Client.Assets.Controls;
+﻿using System.Windows.Controls;
 using MMO_Client.Client.World.Rooms;
-using Newtonsoft.Json.Linq;
-using MMO_Client.Client.Net.Mines.Event;
-using MMO_Client.Client.Net.Mines;
 
 namespace MMO_Client.Screens
 {
-    public partial class GameScreen : Window
+    public partial class GameScreen : UserControl
     {
-        public static GameScreen Instance;
+        public static GameScreen Instance { get; private set; }
 
         public static double GameWidth { get => Instance.canvas.Width; }
         public static double GameHeight { get => Instance.canvas.Height; }
@@ -40,9 +18,7 @@ namespace MMO_Client.Screens
         public GameScreen()
         {
             Instance = this;
-
             InitializeComponent();
-            Show();
 
             RoomManager.Instance.OnRoomCreated += OnRoomCreated;
         }

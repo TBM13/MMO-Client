@@ -4,10 +4,14 @@ using System.Text;
 
 namespace MMO_Client.Client.Net.Mines.IO
 {
-    class ByteArray
+    internal class ByteArray
     {
         public List<byte> Bytes { get; } = new();
-        public int ReadPosition { get; set; } = 0;
+        public int ReadPosition { get; set; }
+        public bool RemoveOnRead { get; set; }
+
+        // 16 KB
+        private char[] fastReadStringBuffer = new char[16000];
 
         public ByteArray() { }
 
@@ -16,6 +20,14 @@ namespace MMO_Client.Client.Net.Mines.IO
 
         public byte ReadByte()
         {
+            if (RemoveOnRead)
+            {
+                byte b = Bytes[0];
+                Bytes.RemoveAt(0);
+
+                return b;
+            }
+
             ReadPosition++;
             return Bytes[ReadPosition - 1];
         }
@@ -105,10 +117,45 @@ namespace MMO_Client.Client.Net.Mines.IO
         public string ReadString()
         {
             int length = ReadInt();
+
             string result = Encoding.ASCII.GetString(Bytes.ToArray(), ReadPosition, length);
 
-            ReadPosition += length;
+            if (!RemoveOnRead)
+                ReadPosition += length;
+
             return result;
+        }
+
+        /// <summary>
+        /// Reads a string in a faster but unsafer way.
+        /// Not recommended for important data as it can't parse special characters.
+        /// </summary>
+        public string FastReadString()
+        {
+            int length = ReadInt();
+
+            if (length > fastReadStringBuffer.Length)
+                Array.Resize(ref fastReadStringBuffer, fastReadStringBuffer.Length * 2);
+
+            for (int i = 0; i < length; i++)
+            {
+                byte b = ReadByte();
+                char c = b switch
+                {
+                    129 => 'Á',
+                    137 => 'É',
+                    141 => 'Í',
+                    145 => 'Ñ',
+                    147 => 'Ó',
+                    154 => 'Ú',
+                    194 or 195 => '\0',
+                    _ => (char)b,
+                };
+
+                fastReadStringBuffer[i] = c;
+            }
+
+            return new string(fastReadStringBuffer, 0, length).Replace("\0", "");
         }
     }
 }

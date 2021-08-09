@@ -1,11 +1,12 @@
-﻿<Window x:Class="MMO_Client.Screens.GameScreen"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="GameScreen" Height="835.656" Width="1038">
+﻿<UserControl x:Class="MMO_Client.Screens.GameScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MMO_Client.Screens"
+             mc:Ignorable="d" 
+             d:DesignHeight="835.656" d:DesignWidth="1038">
     <Viewbox>
         <Canvas x:Name="canvas" Background="Gold" Height="835.656" Width="1038"/>
     </Viewbox>
-</Window>
+</UserControl>

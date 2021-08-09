@@ -1,12 +1,10 @@
-﻿using MMO_Client.Client.Net.Mines.Mobjects;
-
-namespace MMO_Client.Client.Net.Mines.IO
+﻿namespace MMO_Client.Client.Net.Mines.IO
 {
-    class MinesOutputStream : ByteArray
+    internal class MinesOutputStream : ByteArray
     {
         public const int HEADER_TYPE_PING = 1;
-		public const int HEADER_TYPE_LOGIN = 2;
-		public const int HEADER_TYPE_MOBJECT = 3;
+        public const int HEADER_TYPE_LOGIN = 2;
+        public const int HEADER_TYPE_MOBJECT = 3;
 
         public MinesOutputStream() { }
 
@@ -94,7 +92,7 @@ namespace MMO_Client.Client.Net.Mines.IO
                     break;
                 case MobjectDataType.BOOLEAN_ARRAY:
                     WriteArrayHeader(mos, 'B', mData);
-                    foreach(object obj in mData.Value)
+                    foreach (object obj in mData.Value)
                         mos.WriteBoolean((bool)obj);
 
                     break;
@@ -108,7 +106,7 @@ namespace MMO_Client.Client.Net.Mines.IO
 
                     break;
                 default:
-                    Logger.Error($"Unable to write Mobject data! Unknown DataType {mData.DataType}", true);
+                    Logger.Fatal($"Unable to write Mobject data! Unknown DataType {mData.DataType}");
                     break;
             }
 
