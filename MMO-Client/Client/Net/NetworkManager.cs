@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.Net.Requests;
 
@@ -9,9 +10,6 @@ namespace MMO_Client.Client.Net
         public static NetworkManager Instance;
 
         #region events
-        public Events.Mines1Event OnConnect;
-        public Events.Mines1Event OnLogout;
-
         public Events.Mines1Event OnBuddyAdded;
         public Events.Mines1Event OnBuddyRemoved;
         public Events.Mines1Event OnBuddyBlocked;
@@ -66,15 +64,13 @@ namespace MMO_Client.Client.Net
         #endregion
 
         private string preff;
-        private int counter = 0;
+        private int counter;
 
         public NetworkManager()
         {
             Instance = this;
 
-            MinesServer.Instance.OnConnect += (MinesEvent ev) => OnConnect?.Invoke(ev);
-            MinesServer.Instance.OnLogout += (MinesEvent ev) => OnLogout?.Invoke(ev);
-            MinesServer.Instance.OnMessage += HandleMamboEvent;
+            MinesServer.Instance.OnMessage += InvokeHandleMamboEvent;
 
             Logger.Info("Initialized");
 
@@ -108,16 +104,30 @@ namespace MMO_Client.Client.Net
 
         private string GenerateID()
         {
-            preff ??= DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString() + "_";
+            preff ??= Utils.GetUnixTime().ToString() + "_";
             return preff + counter++.ToString();
         }
 
+        // We want to execute HandleMamboEvent in the main thread
+        private void InvokeHandleMamboEvent(MinesEvent mEvent) =>
+            Application.Current.Dispatcher.Invoke(new Action(() => { HandleMamboEvent(mEvent); }));
+
         private void HandleMamboEvent(MinesEvent mEvent)
         {
-            string type = mEvent.Mobject.Strings["type"];
+            Mobject mobj = mEvent.Mobject;
+            string type = mobj.Strings["type"];
 
             if (!mEvent.Success)
-                Logger.Warn($"Received a failing \"{type}\". Error Code: {mEvent.ErrorCode}");
+            {
+                string errorMsg = "";
+                if (mobj.Strings.ContainsKey("errorMessage"))
+                    errorMsg = mobj.Strings["errorMessage"];
+                else
+                    Logger.Debug("Does the mobject contain any error code?");
+
+                Logger.Warn($"Received a failing {type} : {errorMsg}");
+                return;
+            }
 #if NetworkDebug
             else
                 Logger.Debug($"Received a successful \"{type}\" ({((bool)(mEvent.Mobject?.Strings.ContainsKey("messageId")) ? mEvent.Mobject.Strings["messageId"] : "no Mobject")})");

@@ -206,7 +206,7 @@ namespace MMO_Client.Client.Net.Mines
             pendingMessage.Read(pendingBytes);
             if (pendingMessage.IsComplete())
             {
-#if NetworkDebug
+#if NetworkDebugVerbose
                 Logger.Debug($"Msg parsed ({pendingMessage.Payload})");
 #endif
 
@@ -222,9 +222,9 @@ namespace MMO_Client.Client.Net.Mines
                     return;
                 }
             }
-#if NetworkDebug
+#if NetworkDebugVerbose
             else
-                Logger.Instance.Debug($"Msg isn't complete, waiting for more bytes ({pendingMessage.Length}/{pendingMessage.Payload})", Name);
+                Logger.Debug($"Msg isn't complete, waiting for more bytes ({pendingMessage.Length}/{pendingMessage.Payload})");
 #endif
 
             readingMsg = false;
