@@ -35,7 +35,8 @@ namespace MMO_Client.Client.Net.Mines
                 Instance = this;
 
             pendingBytes.RemoveOnRead = true;
-            msgProcessingThread = new Thread(ProcessMessage);
+            msgProcessingThread = new(ProcessMessage);
+            msgProcessingThread.IsBackground = true;
         }
 
         /// <summary>
