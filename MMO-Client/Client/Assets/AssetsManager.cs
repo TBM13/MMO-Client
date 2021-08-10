@@ -3,7 +3,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Windows.Markup;
 using System.Windows.Media;
-using Newtonsoft.Json.Linq;
 using System.Windows.Media.Imaging;
 using System;
 
@@ -52,7 +51,7 @@ namespace MMO_Client.Client.Assets
             return path;
         }
 
-        public static dynamic GetAssetProperties(string ID)
+        public static Dictionary<string, dynamic> GetAssetProperties(string ID)
         {
             string path = AssetsPath;
             string[] splittedID = ID.Split(".");
@@ -64,7 +63,7 @@ namespace MMO_Client.Client.Assets
             if (!File.Exists(path))
                 return null;
 
-            return JObject.Parse(File.ReadAllText(path));
+            return JsonUtils.ParseJsonDictionary(File.ReadAllText(path));
         }
 
         #region Image Asset

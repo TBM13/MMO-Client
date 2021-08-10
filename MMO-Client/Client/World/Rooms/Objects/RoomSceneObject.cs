@@ -15,7 +15,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
         public bool Blocks { get; private set; }
 
         private ImageAsset imageAsset;
-        private dynamic properties;
+        private Dictionary<string, dynamic> properties;
 
         public bool IsGrabbable
         {
@@ -70,11 +70,11 @@ namespace MMO_Client.Client.World.Rooms.Objects
         {
             Dictionary<string, int> animations = null;
 
-            if (properties?.animations != null)
+            if (properties?.ContainsKey("animations") != null)
             {
                 animations = new();
-                foreach (var obj in properties.animations)
-                    animations.Add((string)obj.Name, (int)obj.Value);
+                foreach (KeyValuePair<string, int> pair in properties["animations"])
+                    animations.Add(pair.Key, pair.Value);
             }
 
             imageAsset.LoadAllFrames(animations);
@@ -103,8 +103,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
             }
             else
             {
-                xCorrection = ((double)properties.bounds[0] * GameScreen.SizeMultiplier) + ((double)properties.bounds[1] * 1.07); // Where did the 1.07 come from? I don't know
-                yCorrection = ((double)properties.bounds[1] * GameScreen.SizeMultiplier);
+                xCorrection = (properties["bounds"][0] * GameScreen.SizeMultiplier) + (properties["bounds"][1] * 1.07); // Where did the 1.07 come from? I don't know
+                yCorrection = (properties["bounds"][1] * GameScreen.SizeMultiplier);
 
                 // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
             }
