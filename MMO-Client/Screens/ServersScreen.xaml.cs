@@ -55,7 +55,7 @@ namespace MMO_Client.Screens
             for (int i = 0; i < serversArray.Length; i++)
             {
                 dynamic server = serversArray[i];
-                servers[i] = new Server(server["host"], server["port"], Math.Round(server["usage"] * 100, 2), server["name"].ToUpperInvariant());
+                servers[i] = new Server(server["host"], server["port"], Math.Round((double)(server["usage"] * 100), 2), server["name"].ToUpperInvariant());
                 AddServerButton(servers[i]);
             }
         }
