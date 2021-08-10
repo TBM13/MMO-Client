@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MMO_Client.Client.Net.Mines;
+using System.Collections.Generic;
 
 namespace MMO_Client.Client.Attributes
 {
@@ -22,5 +23,15 @@ namespace MMO_Client.Client.Attributes
 
         public void Clear() =>
             attributes.Clear();
+
+        public void BuildFromMobjectArray(Mobject[] mobjs)
+        {
+            foreach (Mobject mobj in mobjs)
+            {
+                CustomAttribute attrib = new();
+                attrib.BuildFromMobject(mobj);
+                attributes[attrib.Key] = attrib;
+            }
+        }
     }
 }
