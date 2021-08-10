@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="SharpVectors" Version="1.7.5" />
+	  <PackageReference Include="SharpVectors" Version="1.7.6" />
   </ItemGroup>
 
   <ItemGroup>
