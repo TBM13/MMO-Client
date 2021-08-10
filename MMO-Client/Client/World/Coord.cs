@@ -12,5 +12,12 @@
             Y = y;
             Z = z;
         }
+
+        public Coord(int[] array)
+        {
+            X = array[0];
+            Y = array[1];
+            Z = array[2];
+        }
     }
 }
