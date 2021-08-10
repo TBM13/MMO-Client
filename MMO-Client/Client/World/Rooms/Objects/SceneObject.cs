@@ -4,7 +4,7 @@ using System.Windows;
 
 namespace MMO_Client.Client.World.Rooms.Objects
 {
-    internal class SceneObject
+    internal class SceneObject : IMobjectBuildable
     {
         protected string Name { get; private set; }
         protected int Id { get; private set; }

@@ -4,7 +4,7 @@ using MMO_Client.Client.Net.Mines.IO;
 
 namespace MMO_Client.Client.Net.Mines
 {
-    internal class Message
+    internal class Message : IMobjectable
     {
         public const int HEADER_TYPE = 3;
 

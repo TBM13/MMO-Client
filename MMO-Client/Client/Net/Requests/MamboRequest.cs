@@ -2,7 +2,7 @@
 
 namespace MMO_Client.Client.Net.Requests
 {
-    internal class MamboRequest
+    internal class MamboRequest : IMobjectable
     {
         public string Type { get; private set; }
 

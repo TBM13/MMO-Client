@@ -1,6 +1,6 @@
 ﻿namespace MMO_Client.Client.World
 {
-    class Coord
+    internal class Coord
     {
         public int X { get; init; }
         public int Y { get; init; }

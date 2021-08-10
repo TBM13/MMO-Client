@@ -3,7 +3,7 @@ using System;
 
 namespace MMO_Client.Client.Attributes
 {
-    internal class CustomAttribute
+    internal class CustomAttribute : IMobjectable, IMobjectBuildable
     {
         public const string SystemPrefix = "system_";
 
