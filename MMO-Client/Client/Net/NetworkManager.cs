@@ -105,7 +105,7 @@ namespace MMO_Client.Client.Net
             }
 
 #if NetworkDebug
-            Logger.Debug($"Sending action {mobj.Strings["request"]}");
+            Logger.Debug($"Sending action {request.Type}");
 #endif
 
             mobj.Strings["request"] = request.Type;
