@@ -8,13 +8,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using MMO_Client.Client.Net.Mines;
+using MMO_Client.Client.World.Rooms.Objects;
 using MMO_Client.Screens;
 
 namespace MMO_Client.Client.World.Rooms
 {
-    class Room
+    internal class Room
     {
-        public static Room CurrentRoom;
+        public static Room CurrentRoom { get; private set; }
 
         public string Name { get; init; }
         public int ID { get; init; }
@@ -75,11 +76,10 @@ namespace MMO_Client.Client.World.Rooms
 
         private void CreateObjects(Mobject[] objects)
         {
-            foreach (Mobject obj in objects)
+            foreach (Mobject mobj in objects)
             {
-                Coord coord = new(obj.IntegerArrays["coord"][0], obj.IntegerArrays["coord"][1]);
-                Size size = new(obj.IntegerArrays["size"][0], obj.IntegerArrays["size"][1]);
-                _ = new RoomObject(obj.Strings["id"], obj.Strings["name"], coord, size, obj.Integers["direction"], obj.Booleans["blockingHint"]);
+                RoomSceneObject roomObj = new(new Attributes.CustomAttributeList());
+                roomObj.BuildFromMobject(mobj);
             }
         }
     }

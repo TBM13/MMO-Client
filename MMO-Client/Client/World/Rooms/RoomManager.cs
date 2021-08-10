@@ -28,7 +28,7 @@ namespace MMO_Client.Client.World.Rooms
         private void OnAvatarJoins(MinesEvent mEvent)
         {
             NetworkManager.Instance.OnAvatarJoins -= OnAvatarJoins;
-            //LoadRoomData();
+            LoadRoomData();
         }
 
         private void OnRoomData(MinesEvent mEvent)
