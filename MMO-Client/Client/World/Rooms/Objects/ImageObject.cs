@@ -34,7 +34,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
         {
             Dictionary<string, int> animations = null;
 
-            if (properties?.ContainsKey("animations") != null)
+            if (properties != null && properties.ContainsKey("animations"))
             {
                 animations = new();
                 foreach (KeyValuePair<string, object> pair in properties["animations"])
