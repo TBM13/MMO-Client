@@ -3,30 +3,20 @@ using MMO_Client.Client.Attributes;
 using MMO_Client.Screens;
 using System.Collections.Generic;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace MMO_Client.Client.World.Rooms.Objects
 {
-    internal class ImageRoomSceneObject : RoomSceneObject
+    internal class ImageObject : VisualRoomSceneObject
     {
         private ImageAsset imageAsset;
         private Dictionary<string, dynamic> properties;
 
-        public ImageRoomSceneObject(CustomAttributeList attributes) : base(attributes) { }
-
-        protected override void SetCoord(Coord newCoord)
-        {
-            base.SetCoord(newCoord);
-            UpdateAssetPosition();
-        }
+        public ImageObject(CustomAttributeList attributes) : base(attributes) { }
 
         protected override void InitializeAsset()
         {
             imageAsset = AssetsManager.Instance.GetOrCreateImageAsset(Name);
-
-            // Cancel the 3D perspective of the image
-            imageAsset.Image.RenderTransform = new SkewTransform(40, 0);
-            Room.CurrentRoom.Canvas.Children.Add(imageAsset.Image);
+            DrawAsset(imageAsset.Image);
 
             LoadAssetProperties();
         }
@@ -47,8 +37,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
             if (properties?.ContainsKey("animations") != null)
             {
                 animations = new();
-                foreach (KeyValuePair<string, int> pair in properties["animations"])
-                    animations.Add(pair.Key, pair.Value);
+                foreach (KeyValuePair<string, object> pair in properties["animations"])
+                    animations.Add(pair.Key, (int)pair.Value);
             }
 
             imageAsset.LoadAllFrames(animations);
@@ -58,7 +48,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
             imageAsset.Image.Height *= GameScreen.SizeMultiplier;
         }
 
-        private void UpdateAssetPosition()
+        protected override void UpdatePosition()
         {
             double xPos = Coord.X * Tile.Width;
             double yPos = (Coord.Y * Tile.Height) - 6; // Why do we need to decrease 6? I don't know

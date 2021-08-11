@@ -11,7 +11,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
         public bool IsGrabbable
         {
-            get => (bool)Attributes.GetValue("grabbable");
+            get => (bool)Attributes.GetValue("grabbable", false);
         }
 
         public Tile Tile
