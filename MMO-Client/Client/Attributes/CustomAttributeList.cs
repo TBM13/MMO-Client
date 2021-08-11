@@ -26,6 +26,9 @@ namespace MMO_Client.Client.Attributes
             return fallbackValue;
         }
 
+        public bool HasValue(string key) =>
+            attributes.ContainsKey(key);
+
         public void SetValue(string key, object value) => 
             attributes[key].Value = value;
 
