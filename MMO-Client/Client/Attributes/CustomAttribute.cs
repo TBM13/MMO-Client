@@ -61,7 +61,7 @@ namespace MMO_Client.Client.Attributes
                 return s;
             
             if (s[0] == '"')
-                return s[1..];
+                return s.Substring(1, s.Length - 2);
 
             if (s == "true")
                 return true;
