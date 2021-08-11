@@ -57,8 +57,11 @@ namespace MMO_Client.Client.Attributes
 
         public object Deserialize(string s)
         {
+            if (s.Length == 0)
+                return s;
+            
             if (s[0] == '"')
-                return s.Substring(1, s.Length - 1);
+                return s[1..];
 
             if (s == "true")
                 return true;
