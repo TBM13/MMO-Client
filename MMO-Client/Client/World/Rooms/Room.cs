@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using MMO_Client.Client.Attributes;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.World.Rooms.Objects;
 using MMO_Client.Screens;
@@ -20,6 +21,7 @@ namespace MMO_Client.Client.World.Rooms
         public string Name { get; init; }
         public int ID { get; init; }
         public Size Size { get; private set; }
+        public Coord Coord { get; private set; }
 
         public Canvas Canvas { get; init; }
         public Dictionary<int, Dictionary<int, Tile>> TilesMatrix { get; private set; }
@@ -30,7 +32,7 @@ namespace MMO_Client.Client.World.Rooms
 
             Name = mObj.Strings["name"];
             ID = mObj.Integers["id"];
-            Logger.Debug($"Creating Room {ID}");
+            Logger.Debug($"Creating Room {ID} ({Name})");
 
             Canvas = new()
             {
@@ -42,6 +44,7 @@ namespace MMO_Client.Client.World.Rooms
             Canvas.SetTop(Canvas, 287);
 
             Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);
+            Coord = new(mObj.IntegerArrays["coord"]);
 
             foreach (Mobject mobj in mObj.MobjectArrays["tiles"])
             {
@@ -78,7 +81,15 @@ namespace MMO_Client.Client.World.Rooms
         {
             foreach (Mobject mobj in objects)
             {
-                RoomSceneObject roomObj = new(new Attributes.CustomAttributeList());
+                CustomAttributeList attributes = new();
+                attributes.BuildFromMobjectArray(mobj.MobjectArrays["customAttributes"]);
+
+                RoomSceneObject roomObj;
+                if (mobj.Mobjects.ContainsKey("link"))
+                    roomObj = new Portal(attributes, Coord);
+                else
+                    roomObj = new ImageObject(attributes);
+
                 roomObj.BuildFromMobject(mobj);
             }
         }
