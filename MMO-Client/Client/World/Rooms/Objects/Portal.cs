@@ -32,10 +32,15 @@ namespace MMO_Client.Client.World.Rooms.Objects
             width *= GameScreen.SizeMultiplier;
             height *= GameScreen.SizeMultiplier;
 
-            width = 2;
-            height = 50;
-            //offsetX = -width / 2;
-            //offsetY = -height / 2;
+            if (attributes.HasValue("hitX"))
+                offsetX = (dynamic)attributes.GetValue("hitX") * GameScreen.SizeMultiplier;
+            else
+                offsetX = -width / 2;
+
+            if (attributes.HasValue("hitY"))
+                offsetY = (dynamic)attributes.GetValue("hitY") * GameScreen.SizeMultiplier;
+            else
+                offsetY = -height / 2;
 
             Shape = new Rectangle()
             {
