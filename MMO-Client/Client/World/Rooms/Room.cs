@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using MMO_Client.Client.Attributes;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.World.Rooms.Objects;
@@ -14,22 +8,23 @@ using MMO_Client.Screens;
 
 namespace MMO_Client.Client.World.Rooms
 {
-    internal class Room
+    internal class Room : IMobjectBuildable
     {
         public static Room CurrentRoom { get; private set; }
 
-        public string Name { get; init; }
-        public int ID { get; init; }
+        public string Name { get; private set; }
+        public int ID { get; private set; }
         public Size Size { get; private set; }
         public Coord Coord { get; private set; }
 
         public Canvas Canvas { get; init; } = new();
         public Dictionary<int, Dictionary<int, Tile>> TilesMatrix { get; private set; }
 
-        public Room(Mobject mObj)
-        {
+        public Room() => 
             CurrentRoom = this;
 
+        public void BuildFromMobject(Mobject mObj)
+        {
             Name = mObj.Strings["name"];
             ID = mObj.Integers["id"];
             Logger.Debug($"Creating Room {ID} ({Name})");
@@ -64,11 +59,9 @@ namespace MMO_Client.Client.World.Rooms
 
             foreach (Mobject obj in tiles)
             {
-                int x = obj.IntegerArrays["coord"][0];
-                int y = obj.IntegerArrays["coord"][1];
-
-                Tile tile = new(new Coord(x, y), obj.Booleans["blockingHint"]);
-                TilesMatrix[x][y] = tile;
+                Tile tile = new();
+                tile.BuildFromMobject(obj);
+                TilesMatrix[tile.Coord.X][tile.Coord.Y] = tile;
             }
         }
 

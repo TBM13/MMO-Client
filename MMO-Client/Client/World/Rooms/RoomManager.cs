@@ -9,7 +9,7 @@ using MMO_Client.Client.Net.Requests.Room;
 
 namespace MMO_Client.Client.World.Rooms
 {
-    class RoomManager
+    internal class RoomManager
     {
         public static RoomManager Instance;
         public Events.Event OnRoomCreated;
@@ -36,7 +36,8 @@ namespace MMO_Client.Client.World.Rooms
             if (!mEvent.Success)
                 return;
 
-            _ = new Room(mEvent.Mobject);
+            Room room = new();
+            room.BuildFromMobject(mEvent.Mobject);
             OnRoomCreated?.Invoke();
         }
     }

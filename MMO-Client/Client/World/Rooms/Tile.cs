@@ -1,4 +1,5 @@
 ﻿using MMO_Client.Client.Config;
+using MMO_Client.Client.Net.Mines;
 using MMO_Client.Screens;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,7 +8,7 @@ using System.Windows.Shapes;
 
 namespace MMO_Client.Client.World.Rooms
 {
-    internal class Tile
+    internal class Tile : IMobjectBuildable
     {
         public const double Width = 71 * GameScreen.SizeMultiplier;
         public const double Height = 23 * GameScreen.SizeMultiplier;
@@ -16,24 +17,21 @@ namespace MMO_Client.Client.World.Rooms
         public const double OffsetX = 42;
         public const double OffsetY = 21;
 
-        public Coord Coord { get; init; }
-        public bool Blocked { get; init; }
+        public Coord Coord { get; private set; }
+        public bool BlockingHint { get; private set; }
         public Point PositionInCanvas { get; private set; }
 
         private Rectangle rectangle;
 
-        public Tile(Coord coord, bool blocked)
+        public void BuildFromMobject(Mobject mobj)
         {
-            Coord = coord;
-            Blocked = blocked;
+            BlockingHint = mobj.Booleans["blockingHint"];
+            Coord = new Coord(mobj.IntegerArrays["coord"]);
 
-            CreateTile();
+            CreateRectangle();
         }
 
-        /// <summary>
-        /// Creates and adds the tile to the room.
-        /// </summary>
-        private void CreateTile()
+        private void CreateRectangle()
         {
             rectangle = new()
             {
@@ -57,7 +55,7 @@ namespace MMO_Client.Client.World.Rooms
             if (Settings.Instance.Dictionary["debug"]["showTiles"])
             {
                 rectangle.Stroke = Brushes.Black;
-                rectangle.Fill = Blocked ? Brushes.Red : null;
+                rectangle.Fill = BlockingHint ? Brushes.Red : null;
                 rectangle.Opacity = 0.5;
             }
 
