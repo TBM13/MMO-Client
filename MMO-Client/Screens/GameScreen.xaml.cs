@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using MMO_Client.Client.World.Rooms;
 
 namespace MMO_Client.Screens
@@ -11,15 +12,12 @@ namespace MMO_Client.Screens
         public static double GameWidth { get => Instance.canvas.Width; }
         public static double GameHeight { get => Instance.canvas.Height; }
 
-        /// <summary>
-        /// The objects look too small in comparison to MG, so we have to multiply their size.
-        /// </summary>
-        public const double SizeMultiplier = 1.3;
-
         public GameScreen()
         {
             Instance = this;
             InitializeComponent();
+
+            Viewbox.RenderTransform = new ScaleTransform(1.3, 1.3);
         }
 
         public void Setup()

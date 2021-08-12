@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:MMO_Client.Screens"
              mc:Ignorable="d" 
              d:DesignHeight="835.656" d:DesignWidth="1038">
-    <Viewbox>
+    <Viewbox x:Name="Viewbox">
         <Canvas x:Name="canvas" Background="Gold" Height="835.656" Width="1038">
             <local:LoadScreen x:Name="LoadScreen" Height="835.656" Width="1038" Panel.ZIndex="99"/>
         </Canvas>

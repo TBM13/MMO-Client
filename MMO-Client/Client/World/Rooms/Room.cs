@@ -31,7 +31,7 @@ namespace MMO_Client.Client.World.Rooms
 
             // Apply Margin
             Canvas.SetLeft(Canvas, -380);
-            Canvas.SetTop(Canvas, 287);
+            Canvas.SetTop(Canvas, 225);
 
             Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);
             Coord = new(mObj.IntegerArrays["coord"]);

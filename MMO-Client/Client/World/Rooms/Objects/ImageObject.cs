@@ -43,9 +43,6 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
             imageAsset.LoadAllFrames(animations);
             imageAsset.DrawFrame(1);
-
-            imageAsset.Image.Width *= GameScreen.SizeMultiplier;
-            imageAsset.Image.Height *= GameScreen.SizeMultiplier;
         }
 
         protected override void UpdatePosition()
@@ -67,8 +64,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
             }
             else
             {
-                xCorrection = (properties["bounds"][0] * GameScreen.SizeMultiplier) + (properties["bounds"][1] * 1.07); // Where did the 1.07 come from? I don't know
-                yCorrection = (properties["bounds"][1] * GameScreen.SizeMultiplier);
+                xCorrection = (properties["bounds"][0]) + (properties["bounds"][1] * 1.07); // Where did the 1.07 come from? I don't know
+                yCorrection = (properties["bounds"][1]);
 
                 // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
             }

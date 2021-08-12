@@ -10,8 +10,8 @@ namespace MMO_Client.Client.World.Rooms
 {
     internal class Tile : IMobjectBuildable
     {
-        public const double Width = 71 * GameScreen.SizeMultiplier;
-        public const double Height = 23 * GameScreen.SizeMultiplier;
+        public const double Width = 71;
+        public const double Height = 23;
 
         // Why do we need to decrease 42 and 21? I don't know
         public const double OffsetX = 42;
@@ -43,7 +43,7 @@ namespace MMO_Client.Client.World.Rooms
             };
 
             double x = Coord.X * Width - OffsetX;
-            x += 25 * (Room.CurrentRoom.Size.Height - Coord.Y); // SkewTransform correction
+            x += 19.3 * (Room.CurrentRoom.Size.Height - Coord.Y); // SkewTransform correction
 
             double y = Coord.Y * Height - OffsetY;
             Canvas.SetLeft(rectangle, x);

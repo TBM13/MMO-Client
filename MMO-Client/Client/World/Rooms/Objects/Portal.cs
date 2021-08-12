@@ -29,18 +29,11 @@ namespace MMO_Client.Client.World.Rooms.Objects
         {
             this.roomCoord = roomCoord;
 
-            double width = (dynamic)attributes.GetValue("hitWidth", Tile.Width / GameScreen.SizeMultiplier);
-            double height = (dynamic)attributes.GetValue("hitHeight", Tile.Height / GameScreen.SizeMultiplier);
-            width *= GameScreen.SizeMultiplier;
-            height *= GameScreen.SizeMultiplier;
+            double width = (dynamic)attributes.GetValue("hitWidth", Tile.Width);
+            double height = (dynamic)attributes.GetValue("hitHeight", Tile.Height);
 
-            offsetX = attributes.HasValue("hitX") 
-                ? (double)((dynamic)attributes.GetValue("hitX") * GameScreen.SizeMultiplier) 
-                : -width / 2;
-
-            offsetY = attributes.HasValue("hitY") 
-                ? (double)((dynamic)attributes.GetValue("hitY") * GameScreen.SizeMultiplier) 
-                : -height / 2;
+            offsetX = (double)(dynamic)attributes.GetValue("hitX", -width / 2);
+            offsetY = (double)(dynamic)attributes.GetValue("hitY", -height / 2);
 
             Shape = new Rectangle()
             {
