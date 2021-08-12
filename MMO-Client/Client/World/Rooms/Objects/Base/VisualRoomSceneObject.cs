@@ -1,6 +1,5 @@
 ﻿using MMO_Client.Client.Attributes;
 using System.Windows;
-using System.Windows.Media;
 
 namespace MMO_Client.Client.World.Rooms.Objects
 {
@@ -15,8 +14,6 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
         protected void DrawAsset(FrameworkElement visualElement)
         {
-            // Cancel the 3D perspective of the visual element
-            visualElement.RenderTransform = new SkewTransform(40, 0);
             Room.CurrentRoom.Canvas.Children.Add(visualElement);
         }
 

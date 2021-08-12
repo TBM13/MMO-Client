@@ -23,7 +23,7 @@ namespace MMO_Client.Client.World.Rooms
         public Size Size { get; private set; }
         public Coord Coord { get; private set; }
 
-        public Canvas Canvas { get; init; }
+        public Canvas Canvas { get; init; } = new();
         public Dictionary<int, Dictionary<int, Tile>> TilesMatrix { get; private set; }
 
         public Room(Mobject mObj)
@@ -34,13 +34,8 @@ namespace MMO_Client.Client.World.Rooms
             ID = mObj.Integers["id"];
             Logger.Debug($"Creating Room {ID} ({Name})");
 
-            Canvas = new()
-            {
-                RenderTransform = new SkewTransform(-40, 0)
-            };
-
             // Apply Margin
-            Canvas.SetLeft(Canvas, -190);
+            Canvas.SetLeft(Canvas, -380);
             Canvas.SetTop(Canvas, 287);
 
             Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);

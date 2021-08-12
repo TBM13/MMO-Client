@@ -39,16 +39,19 @@ namespace MMO_Client.Client.World.Rooms
                 Width = Width,
                 Height = Height,
                 VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Left
+                HorizontalAlignment = HorizontalAlignment.Left,
+                RenderTransform = new SkewTransform(-40, 0) // 3D Perspective
             };
 
             double x = Coord.X * Width - OffsetX;
+            x += 25 * (Room.CurrentRoom.Size.Height - Coord.Y); // SkewTransform correction
+
             double y = Coord.Y * Height - OffsetY;
             Canvas.SetLeft(rectangle, x);
             Canvas.SetTop(rectangle, y);
 
             // We want the PositionInCanvas point to be the tile center
-            PositionInCanvas = new Point(x + Width / 2.2, y + Height / 2);
+            PositionInCanvas = new Point(x + (Width / 3), y + (Height / 2));
 
             rectangle.Stroke = Brushes.Black;
             rectangle.Fill = Blocked ? Brushes.Red : null;
