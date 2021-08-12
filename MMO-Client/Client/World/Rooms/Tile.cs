@@ -1,4 +1,5 @@
-﻿using MMO_Client.Screens;
+﻿using MMO_Client.Client.Config;
+using MMO_Client.Screens;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -53,9 +54,12 @@ namespace MMO_Client.Client.World.Rooms
             // We want the PositionInCanvas point to be the tile center
             PositionInCanvas = new Point(x + (Width / 3), y + (Height / 2));
 
-            rectangle.Stroke = Brushes.Black;
-            rectangle.Fill = Blocked ? Brushes.Red : null;
-            rectangle.Opacity = 0.5;
+            if (Settings.Instance.Dictionary["debug"]["showTiles"])
+            {
+                rectangle.Stroke = Brushes.Black;
+                rectangle.Fill = Blocked ? Brushes.Red : null;
+                rectangle.Opacity = 0.5;
+            }
 
             Room.CurrentRoom.Canvas.Children.Add(rectangle);
         }
