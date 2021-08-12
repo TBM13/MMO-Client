@@ -1,9 +1,11 @@
 ﻿using MMO_Client.Client.Attributes;
+using MMO_Client.Client.Config;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Screens;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -32,25 +34,38 @@ namespace MMO_Client.Client.World.Rooms.Objects
             width *= GameScreen.SizeMultiplier;
             height *= GameScreen.SizeMultiplier;
 
-            if (attributes.HasValue("hitX"))
-                offsetX = (dynamic)attributes.GetValue("hitX") * GameScreen.SizeMultiplier;
-            else
-                offsetX = -width / 2;
+            offsetX = attributes.HasValue("hitX") 
+                ? (double)((dynamic)attributes.GetValue("hitX") * GameScreen.SizeMultiplier) 
+                : -width / 2;
 
-            if (attributes.HasValue("hitY"))
-                offsetY = (dynamic)attributes.GetValue("hitY") * GameScreen.SizeMultiplier;
-            else
-                offsetY = -height / 2;
+            offsetY = attributes.HasValue("hitY") 
+                ? (double)((dynamic)attributes.GetValue("hitY") * GameScreen.SizeMultiplier) 
+                : -height / 2;
 
             Shape = new Rectangle()
             {
                 Width = width,
                 Height = height,
                 VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Fill = Brushes.Blue,
-                Opacity = 0.3
+                HorizontalAlignment = HorizontalAlignment.Left
             };
+
+            Shape.MouseDown += MouseDown;
+            Shape.MouseEnter += MouseEnter;
+            Shape.MouseLeave += MouseLeave;
+
+            if (Settings.Instance.Dictionary["debug"]["showTiles"])
+            {
+                Canvas.SetZIndex(Shape, 1);
+                Shape.Fill = Brushes.Blue;
+                Shape.Opacity = 0.2;
+
+                Shape.MouseEnter += (_, _) =>
+                    Shape.Opacity = 0.4;
+
+                Shape.MouseLeave += (_, _) =>
+                    Shape.Opacity = 0.2;
+            }
         }
 
         public override void BuildFromMobject(Mobject mobj)
@@ -68,6 +83,24 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
             Canvas.SetLeft(Shape, xPos);
             Canvas.SetTop(Shape, yPos);
+        }
+
+        private void MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton != MouseButtonState.Pressed)
+                return;
+
+            Logger.Error("Not Implemented");
+        }
+
+        private void MouseEnter(object sender, MouseEventArgs e)
+        {
+            Logger.Info((string)Attributes.GetValue("label", "<Null>"));
+        }
+
+        private void MouseLeave(object sender, MouseEventArgs e)
+        {
+            
         }
     }
 }
