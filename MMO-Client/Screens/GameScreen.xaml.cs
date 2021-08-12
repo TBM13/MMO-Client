@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using MMO_Client.Client.World.Rooms;
 
 namespace MMO_Client.Screens
@@ -28,7 +29,20 @@ namespace MMO_Client.Screens
 
         private void OnRoomCreated()
         {
+            if (canvas.Children.Count > 1)
+                canvas.Children.RemoveAt(1);
+
             canvas.Children.Add(Room.CurrentRoom.Canvas);
         }
+
+        public void ShowLoadScreen(string text)
+        {
+            LoadScreen.ResetProgressbar();
+            LoadScreen.LabelText = text;
+            LoadScreen.Visibility = Visibility.Visible;
+        }
+
+        public void HideLoadScreen() => 
+            LoadScreen.Visibility = Visibility.Hidden;
     }
 }

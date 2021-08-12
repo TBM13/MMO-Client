@@ -90,7 +90,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
             if (e.LeftButton != MouseButtonState.Pressed)
                 return;
 
-            Logger.Error("Not Implemented");
+            RoomManager.Instance.ChangeRoom(Link);
         }
 
         private void MouseEnter(object sender, MouseEventArgs e)
