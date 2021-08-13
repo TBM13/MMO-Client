@@ -34,7 +34,7 @@ namespace MMO_Client.Client.World.Rooms
             Logger.Debug($"Creating Room {ID} ({Name})");
 
             // Apply Margin
-            Canvas.SetLeft(Canvas, -373);
+            Canvas.SetLeft(Canvas, -30);
             Canvas.SetTop(Canvas, 84);
 
             Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);
