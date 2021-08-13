@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using MMO_Client.Client.Assets;
 using MMO_Client.Client.Attributes;
 using MMO_Client.Client.Config;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.World.Rooms.Objects;
-using MMO_Client.Screens;
 
 namespace MMO_Client.Client.World.Rooms
 {
@@ -24,6 +24,8 @@ namespace MMO_Client.Client.World.Rooms
         public record TilesPropertiesRecord(double Width, double Height, double Delta, double Angle, double OffsetY);
         public TilesPropertiesRecord TilesProperties { get; private set; }
 
+        private readonly CustomAttributeList attributes = new();
+
         public Room() => 
             CurrentRoom = this;
 
@@ -32,6 +34,7 @@ namespace MMO_Client.Client.World.Rooms
             Name = mObj.Strings["name"];
             ID = mObj.Integers["id"];
             Logger.Debug($"Creating Room {ID} ({Name})");
+            //Clipboard.SetText(mObj.ToString());
 
             // Apply Margin
             Canvas.SetLeft(Canvas, -30);
@@ -39,6 +42,11 @@ namespace MMO_Client.Client.World.Rooms
 
             Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);
             Coord = new(mObj.IntegerArrays["coord"]);
+
+            attributes.BuildFromMobjectArray(mObj.MobjectArrays["customAttributes"]);
+
+            LoadTilesProperties();
+            CreateBackground();
 
             foreach (Mobject mobj in mObj.MobjectArrays["tiles"])
             {
@@ -63,7 +71,6 @@ namespace MMO_Client.Client.World.Rooms
 
         private void CreateTiles(Mobject[] tiles)
         {
-            LoadTilesProperties();
             Canvas.SetTop(Canvas, Canvas.GetTop(Canvas) + TilesProperties.OffsetY);
 
             TilesMatrix = new();
@@ -93,6 +100,25 @@ namespace MMO_Client.Client.World.Rooms
 
                 roomObj.BuildFromMobject(mobj);
             }
+        }
+
+        private void CreateBackground()
+        {
+            if (!attributes.HasValue("background"))
+            {
+                Logger.Warn($"Room '{Name}' doesn't have any background");
+                return;
+            }
+
+            ImageAsset background;
+            background = AssetsManager.Instance.GetOrCreateImageAsset($"backgrounds.{attributes.GetValue("background")}");
+            background.LoadAllFrames();
+            background.DrawFrame(1);
+
+            Canvas.Children.Add(background.Image);
+            Canvas.SetZIndex(background.Image, -1);
+            Canvas.SetLeft(background.Image, -background.Image.Width / 8.5);
+            Canvas.SetTop(background.Image, (-background.Image.Height / 2) + TilesProperties.OffsetY - 88 / 4);
         }
     }
 }
