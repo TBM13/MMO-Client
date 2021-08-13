@@ -67,8 +67,6 @@ namespace MMO_Client.Client.World.Rooms
             Canvas.SetTop(Canvas, Canvas.GetTop(Canvas) + TilesProperties.OffsetY);
 
             TilesMatrix = new();
-            Canvas.Margin = new Thickness(GameScreen.GameWidth / 3, 0, -GameScreen.GameWidth / 3, 0);
-
             for (int i = 0; i < Size.Width; i++)
                 TilesMatrix[i] = new Dictionary<int, Tile>();
 
