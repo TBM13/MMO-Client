@@ -15,8 +15,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
         protected override void UpdatePosition()
         {
-            double xPos = Coord.X * Tile.Width;
-            double yPos = Coord.Y * Tile.Height;
+            double xPos = Coord.X * Room.CurrentRoom.TilesProperties.Width;
+            double yPos = Coord.Y * Room.CurrentRoom.TilesProperties.Height;
 
             Canvas.SetLeft(Shape, xPos);
             Canvas.SetTop(Shape, yPos);

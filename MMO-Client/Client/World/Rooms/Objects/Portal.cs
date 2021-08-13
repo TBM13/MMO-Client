@@ -1,7 +1,6 @@
 ﻿using MMO_Client.Client.Attributes;
 using MMO_Client.Client.Config;
 using MMO_Client.Client.Net.Mines;
-using MMO_Client.Screens;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,8 +28,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
         {
             this.roomCoord = roomCoord;
 
-            double width = (dynamic)attributes.GetValue("hitWidth", Tile.Width);
-            double height = (dynamic)attributes.GetValue("hitHeight", Tile.Height);
+            double width = (dynamic)attributes.GetValue("hitWidth", Room.CurrentRoom.TilesProperties.Width);
+            double height = (dynamic)attributes.GetValue("hitHeight", Room.CurrentRoom.TilesProperties.Height);
 
             offsetX = (double)(dynamic)attributes.GetValue("hitX", -width / 2);
             offsetY = (double)(dynamic)attributes.GetValue("hitY", -height / 2);

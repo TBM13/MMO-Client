@@ -1,6 +1,5 @@
 ﻿using MMO_Client.Client.Assets;
 using MMO_Client.Client.Attributes;
-using MMO_Client.Screens;
 using System.Collections.Generic;
 using System.Windows.Controls;
 
@@ -47,8 +46,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
         protected override void UpdatePosition()
         {
-            double xPos = Coord.X * Tile.Width;
-            double yPos = (Coord.Y * Tile.Height) - 6; // Why do we need to decrease 6? I don't know
+            double xPos = Coord.X * Room.CurrentRoom.TilesProperties.Width;
+            double yPos = (Coord.Y * Room.CurrentRoom.TilesProperties.Height) - 6; // Why do we need to decrease 6? I don't know
             double xCorrection;
             double yCorrection;
 
@@ -56,8 +55,8 @@ namespace MMO_Client.Client.World.Rooms.Objects
             {
                 // Try an alternative method to position the object
                 // It's very inaccurate, but better than nothing
-                yCorrection = -(imageAsset.Image.Height - (Tile.Height / 2));
-                xCorrection = -(imageAsset.Image.Width - (Tile.Width / 1.5)) + yCorrection;
+                yCorrection = -(imageAsset.Image.Height - (Room.CurrentRoom.TilesProperties.Height / 2));
+                xCorrection = -(imageAsset.Image.Width - (Room.CurrentRoom.TilesProperties.Width / 1.5)) + yCorrection;
 
                 xCorrection /= Size.Width;
                 yCorrection /= Size.Height;

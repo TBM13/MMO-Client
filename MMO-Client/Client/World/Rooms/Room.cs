@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using MMO_Client.Client.Attributes;
+using MMO_Client.Client.Config;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.World.Rooms.Objects;
 using MMO_Client.Screens;
@@ -18,7 +19,10 @@ namespace MMO_Client.Client.World.Rooms
         public Coord Coord { get; private set; }
 
         public Canvas Canvas { get; init; } = new();
+
         public Dictionary<int, Dictionary<int, Tile>> TilesMatrix { get; private set; }
+        public record TilesPropertiesRecord(double Width, double Height, double Delta, double Angle, double OffsetY);
+        public TilesPropertiesRecord TilesProperties { get; private set; }
 
         public Room() => 
             CurrentRoom = this;
@@ -30,8 +34,8 @@ namespace MMO_Client.Client.World.Rooms
             Logger.Debug($"Creating Room {ID} ({Name})");
 
             // Apply Margin
-            Canvas.SetLeft(Canvas, -380);
-            Canvas.SetTop(Canvas, 225);
+            Canvas.SetLeft(Canvas, -373);
+            Canvas.SetTop(Canvas, 84);
 
             Size = new(mObj.IntegerArrays["size"][0], mObj.IntegerArrays["size"][1]);
             Coord = new(mObj.IntegerArrays["coord"]);
@@ -48,10 +52,21 @@ namespace MMO_Client.Client.World.Rooms
             CreateObjects(mObj.MobjectArrays["sceneObjects"]);
         }
 
+        private void LoadTilesProperties()
+        {
+            Dictionary<string, dynamic> dic = Settings.Instance.Dictionary["_tiles_"]["normal"];
+            if (Settings.Instance.Dictionary["_tiles_"].ContainsKey(ID.ToString()))
+                dic = Settings.Instance.Dictionary["_tiles_"][ID.ToString()];
+
+            TilesProperties = new(dic["width"], dic["height"], dic["delta"], dic["angle"], dic["layerY"]);
+        }
+
         private void CreateTiles(Mobject[] tiles)
         {
-            TilesMatrix = new();
+            LoadTilesProperties();
+            Canvas.SetTop(Canvas, Canvas.GetTop(Canvas) + TilesProperties.OffsetY);
 
+            TilesMatrix = new();
             Canvas.Margin = new Thickness(GameScreen.GameWidth / 3, 0, -GameScreen.GameWidth / 3, 0);
 
             for (int i = 0; i < Size.Width; i++)
