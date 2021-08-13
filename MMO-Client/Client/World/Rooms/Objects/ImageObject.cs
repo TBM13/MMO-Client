@@ -46,28 +46,33 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
         protected override void UpdatePosition()
         {
-            double xPos = Coord.X * Room.CurrentRoom.TilesProperties.Width;
-            double yPos = (Coord.Y * Room.CurrentRoom.TilesProperties.Height) - 6; // Why do we need to decrease 6? I don't know
+            Tile tile = Tile;
+            
             double xCorrection;
             double yCorrection;
 
             if (properties == null)
             {
+                tile = Room.CurrentRoom.TilesMatrix[Coord.X + (int)Size.Width - 1][Coord.Y + (int)Size.Height - 1];
+
                 // Try an alternative method to position the object
                 // It's very inaccurate, but better than nothing
+                xCorrection = -(imageAsset.Image.Width - (Room.CurrentRoom.TilesProperties.Width / 2));
                 yCorrection = -(imageAsset.Image.Height - (Room.CurrentRoom.TilesProperties.Height / 2));
-                xCorrection = -(imageAsset.Image.Width - (Room.CurrentRoom.TilesProperties.Width / 1.5)) + yCorrection;
 
                 xCorrection /= Size.Width;
                 yCorrection /= Size.Height;
             }
             else
             {
-                xCorrection = (properties["bounds"][0]) + (properties["bounds"][1] * 1.07); // Where did the 1.07 come from? I don't know
-                yCorrection = (properties["bounds"][1]);
+                xCorrection = properties["bounds"][0];
+                yCorrection = properties["bounds"][1];
 
                 // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
             }
+
+            double xPos = tile.PositionInCanvas.X;
+            double yPos = tile.PositionInCanvas.Y;
 
             Canvas.SetLeft(imageAsset.Image, xPos + xCorrection);
             Canvas.SetTop(imageAsset.Image, yPos + yCorrection);
