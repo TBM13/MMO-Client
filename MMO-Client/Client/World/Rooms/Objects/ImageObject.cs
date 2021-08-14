@@ -2,6 +2,7 @@
 using MMO_Client.Client.Attributes;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace MMO_Client.Client.World.Rooms.Objects
 {
@@ -10,12 +11,29 @@ namespace MMO_Client.Client.World.Rooms.Objects
         private ImageAsset imageAsset;
         private Dictionary<string, dynamic> properties;
 
+        private ScaleTransform scaleTransform;
+
+        public double ScaleX
+        {
+            get => scaleTransform.ScaleX;
+            set => scaleTransform.ScaleX = value;
+        }
+
+        public double ScaleY
+        {
+            get => scaleTransform.ScaleY;
+            set => scaleTransform.ScaleY = value;
+        }
+
         public ImageObject(CustomAttributeList attributes) : base(attributes) { }
 
         protected override void InitializeAsset()
         {
             imageAsset = AssetsManager.Instance.GetOrCreateImageAsset(Name);
             DrawAsset(imageAsset.Image);
+
+            scaleTransform = new(1, 1);
+            imageAsset.Image.RenderTransform = scaleTransform;
 
             LoadAssetProperties();
         }
