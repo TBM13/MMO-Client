@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using MMO_Client.Client.Assets;
@@ -9,7 +10,7 @@ using MMO_Client.Client.World.Rooms.Objects;
 
 namespace MMO_Client.Client.World.Rooms
 {
-    internal class Room : IMobjectBuildable
+    internal class Room : IMobjectBuildable, IDisposable
     {
         public static Room CurrentRoom { get; private set; }
 
@@ -25,6 +26,7 @@ namespace MMO_Client.Client.World.Rooms
         public TilesPropertiesRecord TilesProperties { get; private set; }
 
         private readonly CustomAttributeList attributes = new();
+        private readonly List<RoomSceneObject> sceneObjects = new();
 
         public Room() => 
             CurrentRoom = this;
@@ -98,6 +100,7 @@ namespace MMO_Client.Client.World.Rooms
                 else
                     roomObj = new ImageObject(attributes);
 
+                sceneObjects.Add(roomObj);
                 roomObj.BuildFromMobject(mobj);
             }
         }
@@ -119,6 +122,12 @@ namespace MMO_Client.Client.World.Rooms
             Canvas.SetZIndex(background.Image, -1);
             Canvas.SetLeft(background.Image, -background.Image.Width / 8.5);
             Canvas.SetTop(background.Image, (-background.Image.Height / 2) + TilesProperties.OffsetY - 88 / 4);
+        }
+
+        public void Dispose()
+        {
+            foreach (RoomSceneObject obj in sceneObjects)
+                obj.Dispose();
         }
     }
 }

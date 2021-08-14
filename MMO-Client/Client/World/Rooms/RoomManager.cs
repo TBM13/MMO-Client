@@ -42,6 +42,8 @@ namespace MMO_Client.Client.World.Rooms
             if (!mEvent.Success)
                 return;
 
+            Room.CurrentRoom?.Dispose();
+
             Room room = new();
             room.BuildFromMobject(mEvent.Mobject);
             OnRoomCreated?.Invoke();

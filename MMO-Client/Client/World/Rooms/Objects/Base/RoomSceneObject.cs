@@ -1,9 +1,10 @@
 ﻿using MMO_Client.Client.Attributes;
 using MMO_Client.Client.Net.Mines;
+using System;
 
 namespace MMO_Client.Client.World.Rooms.Objects
 {
-    internal class RoomSceneObject : SceneObject
+    internal class RoomSceneObject : SceneObject, IDisposable
     {
         public Coord Coord { get; private set; }
         public int Direction { get; private set; }
@@ -36,5 +37,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
             Coord = newCoord;
 
         protected virtual void InitializeAsset() { }
+
+        public virtual void Dispose() { }
     }
 }

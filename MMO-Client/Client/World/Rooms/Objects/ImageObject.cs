@@ -77,5 +77,11 @@ namespace MMO_Client.Client.World.Rooms.Objects
             Canvas.SetLeft(imageAsset.Image, xPos + xCorrection);
             Canvas.SetTop(imageAsset.Image, yPos + yCorrection);
         }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            imageAsset.StopAnimation();
+        }
     }
 }
