@@ -96,7 +96,7 @@ namespace MMO_Client.Client.World.Rooms
 
                 RoomSceneObject roomObj;
                 if (mobj.Mobjects.ContainsKey("link"))
-                    roomObj = new Portal(attributes, Coord);
+                    roomObj = new Portal(attributes);
                 else
                     roomObj = new ImageObject(attributes);
 

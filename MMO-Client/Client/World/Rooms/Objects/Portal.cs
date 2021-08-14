@@ -1,7 +1,6 @@
 ﻿using MMO_Client.Client.Attributes;
 using MMO_Client.Client.Config;
 using MMO_Client.Client.Net.Mines;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,21 +12,11 @@ namespace MMO_Client.Client.World.Rooms.Objects
     internal class Portal : ShapeObject
     {
         public RoomLink Link { get; private set; }
-        public new int Direction
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
 
-        private readonly Coord roomCoord;
         private readonly double offsetX, offsetY;
 
-        public Portal(CustomAttributeList attributes, Coord roomCoord) : base(attributes)
+        public Portal(CustomAttributeList attributes) : base(attributes)
         {
-            this.roomCoord = roomCoord;
-
             double width = (dynamic)attributes.GetValue("hitWidth", Room.CurrentRoom.TilesProperties.Width);
             double height = (dynamic)attributes.GetValue("hitHeight", Room.CurrentRoom.TilesProperties.Height);
 
@@ -92,7 +81,13 @@ namespace MMO_Client.Client.World.Rooms.Objects
 
         private void MouseLeave(object sender, MouseEventArgs e)
         {
-            
+
+        }
+
+        public override int Direction
+        {
+            get => World.Direction.Calculate(Room.CurrentRoom.Coord, Link.WorldCoord);
+            protected set => base.Direction = value;
         }
     }
 }

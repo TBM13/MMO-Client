@@ -7,7 +7,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
     internal class RoomSceneObject : SceneObject, IDisposable
     {
         public Coord Coord { get; private set; }
-        public int Direction { get; private set; }
+        public virtual int Direction { get; protected set; }
         public bool Blocks { get; private set; }
 
         public bool IsGrabbable
