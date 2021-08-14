@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="835.656" d:DesignWidth="1038">
     <Viewbox x:Name="Viewbox">
-        <Canvas x:Name="canvas" Background="Gold" Height="835.656" Width="1038">
+        <Canvas x:Name="canvas" Background="Gold" Height="835.656" Width="1038" MouseWheel="Zoom">
             <local:LoadScreen x:Name="LoadScreen" Height="835.656" Width="1038" Panel.ZIndex="99"/>
         </Canvas>
     </Viewbox>
