@@ -95,7 +95,9 @@ namespace MMO_Client.Client.World.Rooms
                 attributes.BuildFromMobjectArray(mobj.MobjectArrays["customAttributes"]);
 
                 RoomSceneObject roomObj;
-                if (mobj.Mobjects.ContainsKey("link"))
+                if (mobj.Mobjects.ContainsKey("avatar"))
+                    roomObj = new MovingImageObject(attributes);
+                else if (mobj.Mobjects.ContainsKey("link"))
                     roomObj = new Portal(attributes);
                 else
                     roomObj = new ImageObject(attributes);

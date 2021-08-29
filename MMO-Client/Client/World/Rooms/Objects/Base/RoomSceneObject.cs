@@ -8,7 +8,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
     {
         public Coord Coord { get; private set; }
         public virtual int Direction { get; protected set; }
-        public bool Blocks { get; private set; }
+        public virtual bool Blocks { get; private set; }
 
         public bool IsGrabbable
         {
@@ -33,7 +33,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
             SetCoord(new Coord(mobj.IntegerArrays["coord"]));
         }
 
-        protected virtual void SetCoord(Coord newCoord) => 
+        public virtual void SetCoord(Coord newCoord) => 
             Coord = newCoord;
 
         protected virtual void InitializeAsset() { }

@@ -8,10 +8,10 @@ namespace MMO_Client.Client.World.Rooms.Objects
 {
     internal class ImageObject : VisualRoomSceneObject
     {
-        private ImageAsset imageAsset;
-        private Dictionary<string, dynamic> properties;
+        public ImageAsset ImageAsset { get; private set; }
 
-        private ScaleTransform scaleTransform;
+        public double? XCorrection { get; private set; } = null;
+        public double? YCorrection { get; private set; } = null;
 
         public double ScaleX
         {
@@ -25,15 +25,18 @@ namespace MMO_Client.Client.World.Rooms.Objects
             set => scaleTransform.ScaleY = value;
         }
 
+        private Dictionary<string, dynamic> properties;
+        private ScaleTransform scaleTransform;
+
         public ImageObject(CustomAttributeList attributes) : base(attributes) { }
 
         protected override void InitializeAsset()
         {
-            imageAsset = AssetsManager.Instance.GetOrCreateImageAsset(Name);
-            DrawAsset(imageAsset.Image);
+            ImageAsset = AssetsManager.Instance.GetOrCreateImageAsset(Name);
+            DrawAsset(ImageAsset.Image);
 
             scaleTransform = new(1, 1);
-            imageAsset.Image.RenderTransform = scaleTransform;
+            ImageAsset.Image.RenderTransform = scaleTransform;
 
             LoadAssetProperties();
         }
@@ -58,48 +61,48 @@ namespace MMO_Client.Client.World.Rooms.Objects
                     animations.Add(pair.Key, (int)pair.Value);
             }
 
-            imageAsset.LoadAllFrames(animations);
-            imageAsset.DrawFrame(1);
+            ImageAsset.LoadAllFrames(animations);
+            ImageAsset.DrawFrame(1);
         }
 
         protected override void UpdatePosition()
         {
             Tile tile = Tile;
             
-            double xCorrection;
-            double yCorrection;
-
-            if (properties == null)
+            if (XCorrection == null)
             {
-                tile = Room.CurrentRoom.TilesMatrix[Coord.X + (int)Size.Width - 1][Coord.Y + (int)Size.Height - 1];
+                if (properties == null)
+                {
+                    tile = Room.CurrentRoom.TilesMatrix[Coord.X + (int)Size.Width - 1][Coord.Y + (int)Size.Height - 1];
 
-                // Try an alternative method to position the object
-                // It's very inaccurate, but better than nothing
-                xCorrection = -(imageAsset.Image.Width - (Room.CurrentRoom.TilesProperties.Width / 2));
-                yCorrection = -(imageAsset.Image.Height - (Room.CurrentRoom.TilesProperties.Height / 2));
+                    // Try an alternative method to position the object
+                    // It's very inaccurate, but better than nothing
+                    XCorrection = -(ImageAsset.Image.Width - (Room.CurrentRoom.TilesProperties.Width / 2));
+                    YCorrection = -(ImageAsset.Image.Height - (Room.CurrentRoom.TilesProperties.Height / 2));
 
-                xCorrection /= Size.Width;
-                yCorrection /= Size.Height;
-            }
-            else
-            {
-                xCorrection = properties["bounds"][0];
-                yCorrection = properties["bounds"][1];
+                    XCorrection /= Size.Width;
+                    YCorrection /= Size.Height;
+                }
+                else
+                {
+                    XCorrection = properties["bounds"][0];
+                    YCorrection = properties["bounds"][1];
 
-                // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
+                    // TODO: Improve correction and figure out how to interact with Size.Width and Size.Height
+                }
             }
 
             double xPos = tile.PositionInCanvas.X;
             double yPos = tile.PositionInCanvas.Y;
 
-            Canvas.SetLeft(imageAsset.Image, xPos + xCorrection);
-            Canvas.SetTop(imageAsset.Image, yPos + yCorrection);
+            Canvas.SetLeft(ImageAsset.Image, xPos + (double)XCorrection);
+            Canvas.SetTop(ImageAsset.Image, yPos + (double)YCorrection);
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            imageAsset.StopAnimation();
+            ImageAsset.StopAnimation();
         }
     }
 }

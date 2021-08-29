@@ -7,17 +7,12 @@ namespace MMO_Client.Client.World.Rooms.Objects
     {
         public VisualRoomSceneObject(CustomAttributeList attributes) : base(attributes) { }
 
-        protected override void InitializeAsset()
-        {
-            Logger.Warn("InitializeAsset() not implemented!");
-        }
-
         protected void DrawAsset(FrameworkElement visualElement)
         {
             Room.CurrentRoom.Canvas.Children.Add(visualElement);
         }
 
-        protected override void SetCoord(Coord newCoord)
+        public override void SetCoord(Coord newCoord)
         {
             base.SetCoord(newCoord);
             UpdatePosition();
