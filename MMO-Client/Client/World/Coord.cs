@@ -31,5 +31,13 @@
 
             return array;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Coord c)
+                return c == this || (c.X == X && c.Y == Y && c.Z == Z);
+
+            return base.Equals(obj);
+        }
     }
 }
