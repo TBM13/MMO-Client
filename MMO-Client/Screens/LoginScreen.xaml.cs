@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -27,7 +28,7 @@ namespace MMO_Client.Screens
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             OnLoginAttempt += OnLoginEvent;
-            Login();
+            _ = LoginAsync();
         }
 
         private void OnLoginEvent(string username, string loginId, bool success)
@@ -52,7 +53,7 @@ namespace MMO_Client.Screens
             return true;
         }
 
-        private async void Login()
+        private async Task LoginAsync()
         {
             LoginProgressbar.Value = 0;
             LoginProgressbar.Visibility = Visibility.Visible;
@@ -105,10 +106,10 @@ namespace MMO_Client.Screens
                 return;
             }
 
-            GetGaturroToken(UsernameBox.Text, PwdBox.Password, csrfToken, loginSession);
+            await GetGaturroTokenAsync(UsernameBox.Text, PwdBox.Password, csrfToken, loginSession);
         }
 
-        private async void GetGaturroToken(string username, string password, string csrfToken, string loginSession)
+        private async Task GetGaturroTokenAsync(string username, string password, string csrfToken, string loginSession)
         {
             Logger.Debug("Attempting to get gaturro token cookie...");
 
@@ -174,7 +175,7 @@ namespace MMO_Client.Screens
                     return;
                 }
 
-                GetLoginID(gaturroToken, xsrfToken, username);
+                await GetLoginIDAsync(gaturroToken, xsrfToken, username);
                 return;
             }
 
@@ -182,7 +183,7 @@ namespace MMO_Client.Screens
             OnLoginAttempt?.Invoke(username.ToUpperInvariant(), "", false);
         }
 
-        private async void GetLoginID(string gaturroToken, string xsrfToken, string username)
+        private async Task GetLoginIDAsync(string gaturroToken, string xsrfToken, string username)
         {
             Logger.Debug("Attempting to get login ID...");
 
@@ -226,7 +227,7 @@ namespace MMO_Client.Screens
                 if (content.Contains("https://descargas.mundogaturro.com/mundogaturro_installer_la.exe"))
                 {
                     Logger.Info("Retrying...");
-                    GetLoginID(gaturroToken, xsrfToken, username);
+                    await GetLoginIDAsync(gaturroToken, xsrfToken, username);
                 }
 
                 return;
@@ -308,7 +309,7 @@ namespace MMO_Client.Screens
             item.MouseDoubleClick += (sender, e) =>
             {
                 OnLoginAttempt += OnLoginEvent;
-                Login();
+                _ = LoginAsync();
             };
 
             SavedCredentialsList.Items.Add(item);

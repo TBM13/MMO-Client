@@ -37,7 +37,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
             StopMoving();
 
             this.path = path;
-            Move();
+            _ = MoveAsync();
         }
 
         public void Move(Coord coord)
@@ -49,7 +49,7 @@ namespace MMO_Client.Client.World.Rooms.Objects
         public void StopMoving() =>
             stopMoving = true;
 
-        private async void Move()
+        private async Task MoveAsync()
         {
             stopMoving = false;
 

@@ -4,6 +4,7 @@ using MMO_Client.Client.Net;
 using MMO_Client.Client.Net.Mines;
 using MMO_Client.Client.World.Rooms;
 using MMO_Client.Screens;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace MMO_Client
@@ -27,12 +28,18 @@ namespace MMO_Client
             // Setup Logger
             Logger.SetOutputScreen(LoggerOutput);
 
+            // Handle Unobserved Task Exceptions
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
             // Setup Game Settings
             _ = new Settings();
 
             // Setup Login Event
             LoginScreen.OnLoginAttempt += OnLoginAttempt;
         }
+
+        private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e) =>
+            Logger.Error($"Unhandled Task Exception\n{e.Exception.InnerException}", false, "Main");
 
         private void OnLoginAttempt(string username, string loginId, bool success)
         {

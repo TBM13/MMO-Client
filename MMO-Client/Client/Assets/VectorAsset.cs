@@ -66,7 +66,7 @@ namespace MMO_Client.Client.Assets
             Viewbox.AddDrawing(drawing, maxBounds);
         }
 
-        public async void StartAnimation()
+        public async Task StartAnimationAsync()
         {
             if (PlayingAnimation)
             {
