@@ -4,43 +4,191 @@ namespace MMO_Client.Client.Net.Mines
 {
     internal class Mobject
     {
-        public Dictionary<string, int> Integers { get; } = new();
-        public Dictionary<string, float> Floats { get; } = new();
-        public Dictionary<string, string> Strings { get; } = new();
-        public Dictionary<string, bool> Booleans { get; } = new();
-        public Dictionary<string, Mobject> Mobjects { get; } = new();
+        public Dictionary<string, int> Integers
+        {
+            get
+            {
+                if (integers == null)
+                    integers = new();
 
-        public Dictionary<string, int[]> IntegerArrays { get; } = new();
-        public Dictionary<string, float[]> FloatArrays { get; } = new();
-        public Dictionary<string, string[]> StringArrays { get; } = new();
-        public Dictionary<string, bool[]> BooleanArrays { get; } = new();
-        public Dictionary<string, Mobject[]> MobjectArrays { get; } = new();
+                return integers;
+            }
+        }
+
+        public Dictionary<string, float> Floats
+        {
+            get
+            {
+                if (floats == null)
+                    floats = new();
+
+                return floats;
+            }
+        }
+
+        public Dictionary<string, string> Strings
+        {
+            get
+            {
+                if (strings == null)
+                    strings = new();
+
+                return strings;
+            }
+        }
+
+        public Dictionary<string, bool> Booleans
+        {
+            get
+            {
+                if (booleans == null)
+                    booleans = new();
+
+                return booleans;
+            }
+        }
+
+        public Dictionary<string, Mobject> Mobjects
+        {
+            get
+            {
+                if (mobjects == null)
+                    mobjects = new();
+
+                return mobjects;
+            }
+        }
+
+        public Dictionary<string, int[]> IntegerArrays
+        {
+            get
+            {
+                if (integerArrays == null)
+                    integerArrays = new();
+
+                return integerArrays;
+            }
+        }
+
+        public Dictionary<string, float[]> FloatArrays
+        {
+            get
+            {
+                if (floatArrays == null)
+                    floatArrays = new();
+
+                return floatArrays;
+            }
+        }
+
+        public Dictionary<string, string[]> StringArrays
+        {
+            get
+            {
+                if (stringArrays == null)
+                    stringArrays = new();
+
+                return stringArrays;
+            }
+        }
+
+        public Dictionary<string, bool[]> BooleanArrays
+        {
+            get
+            {
+                if (booleanArrays == null)
+                    booleanArrays = new();
+
+                return booleanArrays;
+            }
+        }
+
+        public Dictionary<string, Mobject[]> MobjectArrays
+        {
+            get
+            {
+                if (mobjectArrays == null)
+                    mobjectArrays = new();
+
+                return mobjectArrays;
+            }
+        }
+
+        private Dictionary<string, int> integers;
+        private Dictionary<string, float> floats;
+        private Dictionary<string, string> strings;
+        private Dictionary<string, bool> booleans;
+        private Dictionary<string, Mobject> mobjects;
+
+        private Dictionary<string, int[]> integerArrays;
+        private Dictionary<string, float[]> floatArrays;
+        private Dictionary<string, string[]> stringArrays;
+        private Dictionary<string, bool[]> booleanArrays;
+        private Dictionary<string, Mobject[]> mobjectArrays;
 
         public List<MobjectData> Iterator()
         {
             List<MobjectData> list = new();
 
-            foreach (dynamic pair in Integers)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.INTEGER));
-            foreach (dynamic pair in Booleans)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.BOOLEAN));
-            foreach (dynamic pair in Floats)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.FLOAT));
-            foreach (dynamic pair in Strings)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.STRING));
-            foreach (dynamic pair in Mobjects)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.MOBJECT));
+            if (integers != null)
+            {
+                foreach (KeyValuePair<string, int> pair in Integers)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.INTEGER));
+            }
 
-            foreach (dynamic pair in IntegerArrays)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.INTEGER_ARRAY));
-            foreach (dynamic pair in BooleanArrays)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.BOOLEAN_ARRAY));
-            foreach (dynamic pair in FloatArrays)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.FLOAT_ARRAY));
-            foreach (dynamic pair in StringArrays)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.STRING_ARRAY));
-            foreach (dynamic pair in MobjectArrays)
-                list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.MOBJECT_ARRAY));
+            if (booleans != null)
+            {
+                foreach (KeyValuePair<string, bool> pair in Booleans)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.BOOLEAN));
+            }
+
+            if (floats != null)
+            {
+                foreach (KeyValuePair<string, float> pair in Floats)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.FLOAT));
+            }
+
+            if (strings != null)
+            {
+                foreach (KeyValuePair<string, string> pair in Strings)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.STRING));
+            }
+
+            if (mobjects != null)
+            {
+                foreach (KeyValuePair<string, Mobject> pair in Mobjects)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.MOBJECT));
+            }
+
+            if (integerArrays != null)
+            {
+                foreach (KeyValuePair<string, int[]> pair in IntegerArrays)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.INTEGER_ARRAY));
+            }
+
+            if (booleanArrays != null)
+            {
+                foreach (KeyValuePair<string, bool[]> pair in BooleanArrays)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.BOOLEAN_ARRAY));
+            }
+
+            if (floatArrays != null)
+            {
+                foreach (KeyValuePair<string, float[]> pair in FloatArrays)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.FLOAT_ARRAY));
+            }
+
+            if (stringArrays != null)
+            {
+                foreach (KeyValuePair<string, string[]> pair in StringArrays)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.STRING_ARRAY));
+            }
+
+            if (mobjectArrays != null)
+            {
+                foreach (KeyValuePair<string, Mobject[]> pair in MobjectArrays)
+                    list.Add(new MobjectData(pair.Key, pair.Value, MobjectDataType.MOBJECT_ARRAY));
+            }
 
             return list;
         }
@@ -117,7 +265,6 @@ namespace MMO_Client.Client.Net.Mines
         /*public static Mobject StringToMobject(string data)
         {
             Mobject mobj = new Mobject();
-
             int skipAmount = 0;
             foreach(string s in data.Split('\n'))
             {
@@ -126,16 +273,12 @@ namespace MMO_Client.Client.Net.Mines
                     skipAmount--;
                     continue;
                 }
-
                 if (string.IsNullOrEmpty(s))
                     continue;
-
                 string[] splittedS = s.Split(new string[] { ";;;" }, StringSplitOptions.None);
-
                 string key = splittedS[0];
                 int dataType = int.Parse(splittedS[1]);
                 string value = splittedS[2];
-
                 switch (dataType)
                 {
                     case MobjectDataType.STRING:
@@ -153,20 +296,17 @@ namespace MMO_Client.Client.Net.Mines
                     case MobjectDataType.MOBJECT:
                         string mobjData = data.Remove(0, data.IndexOf($"{key};;;{dataType};;;") + key.Length + splittedS[1].Length + 6);
                         string[] mobjData2 = mobjData.Split(new string[] { "\n\n" }, StringSplitOptions.None);
-
                         if (mobjData.Length == 0) // This means the mobject is empty
                         {
                             mobj.Mobjects[key] = new Mobject();
                             break;
                         }
-
                         int mobjsAmount = 0;
                         foreach (string d in mobjData.Split('\n'))
                         {
                             if (d.Contains($";;;{MobjectDataType.MOBJECT};;;"))
                                 mobjsAmount++;
                         }
-
                         skipAmount = mobjData2[mobjsAmount].Split('\n').Length;
                         mobj.Mobjects[key] = StringToMobject(mobjData2[0]);
                         break;
@@ -176,29 +316,23 @@ namespace MMO_Client.Client.Net.Mines
                         break;
                     case MobjectDataType.BOOLEAN_ARRAY:
                         string[] values2 = value.Split(',');
-
                         bool[] boolArray = new bool[values2.Length];
                         for (int i = 0; i < values2.Length; i++)
                             boolArray[i] = bool.Parse(values2[i]);
-
                         mobj.BooleanArrays[key] = boolArray;
                         break;
                     case MobjectDataType.INTEGER_ARRAY:
                         string[] values3 = value.Split(',');
-
                         int[] intArray = new int[values3.Length];
                         for (int i = 0; i < values3.Length; i++)
                             intArray[i] = int.Parse(values3[i]);
-
                         mobj.IntegerArrays[key] = intArray;
                         break;
                     case MobjectDataType.FLOAT_ARRAY:
                         string[] values4 = value.Split(',');
-
                         float[] floatArray = new float[values4.Length];
                         for (int i = 0; i < values4.Length; i++)
                             floatArray[i] = float.Parse(values4[i]);
-
                         mobj.FloatArrays[key] = floatArray;
                         break;
                     case MobjectDataType.MOBJECT_ARRAY:
@@ -209,7 +343,6 @@ namespace MMO_Client.Client.Net.Mines
                         break;
                 }
             }
-
             return mobj;
         }*/
     }

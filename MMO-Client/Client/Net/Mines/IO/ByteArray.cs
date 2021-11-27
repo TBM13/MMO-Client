@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,8 +11,9 @@ namespace MMO_Client.Client.Net.Mines.IO
         public int ReadPosition { get; set; }
         public bool RemoveOnRead { get; set; }
 
-        // 16 KB
-        private char[] fastReadStringBuffer = new char[16000];
+        private readonly byte[] intFloatBuffer = new byte[4];
+        // 8 KB
+        private char[] fastReadStringBuffer = new char[8000];
 
         public ByteArray() { }
 
@@ -44,66 +46,48 @@ namespace MMO_Client.Client.Net.Mines.IO
                 WriteByte(bytes[i]);
         }
 
-        public List<byte> ReadBytes(int length)
+        public byte[] ReadBytes(int length)
         {
-            List<byte> result = new();
+            byte[] result = new byte[length];
 
             for (int i = 0; i < length; i++)
-                result.Add(ReadByte());
+                result[i] = ReadByte();
 
             return result;
         }
 
         public void WriteInt(int i)
         {
-            byte[] b = BitConverter.GetBytes(i);
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(b, 0, b.Length);
-
-            WriteBytes(b, 0, b.Length);
+            BinaryPrimitives.WriteInt32BigEndian(intFloatBuffer, i);
+            WriteBytes(intFloatBuffer, 0, intFloatBuffer.Length);
         }
 
         public int ReadInt()
         {
-            byte[] bytes = new byte[4];
-            for (int i = 0; i < bytes.Length; i++)
-                bytes[i] = ReadByte();
+            for (int i = 0; i < 4; i++)
+                intFloatBuffer[i] = ReadByte();
 
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(bytes);
-
-            return BitConverter.ToInt32(bytes, 0);
+            return BinaryPrimitives.ReadInt32BigEndian(intFloatBuffer);
         }
 
         public void WriteBoolean(bool b) =>
             WriteByte((byte)(b ? 1 : 0));
 
-        public bool ReadBoolean()
-        {
-            byte b = ReadByte();
-            return b == 1;
-        }
+        public bool ReadBoolean() =>
+            ReadByte() == 1;
 
         public void WriteFloat(float f)
         {
-            byte[] b = BitConverter.GetBytes(f);
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(b, 0, b.Length);
-
-            for (int i = 0; i < b.Length; i++)
-                WriteByte(b[i]);
+            BinaryPrimitives.WriteSingleBigEndian(intFloatBuffer, f);
+            WriteBytes(intFloatBuffer, 0, intFloatBuffer.Length);
         }
 
         public float ReadFloat()
         {
-            byte[] bytes = new byte[4];
-            for (int i = 0; i < bytes.Length; i++)
-                bytes[i] = ReadByte();
+            for (int i = 0; i < intFloatBuffer.Length; i++)
+                intFloatBuffer[i] = ReadByte();
 
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(bytes);
-
-            return BitConverter.ToSingle(bytes, 0);
+            return BinaryPrimitives.ReadSingleBigEndian(intFloatBuffer);
         }
 
         public void WriteString(string s)
@@ -135,7 +119,10 @@ namespace MMO_Client.Client.Net.Mines.IO
             int length = ReadInt();
 
             if (length > fastReadStringBuffer.Length)
-                Array.Resize(ref fastReadStringBuffer, fastReadStringBuffer.Length * 2);
+            {
+                Array.Resize(ref fastReadStringBuffer, length);
+                Logger.Debug($"Resized fastReadStringBuffer. String length: {length}", true, "ByteArray");
+            }
 
             for (int i = 0; i < length; i++)
             {
@@ -156,6 +143,13 @@ namespace MMO_Client.Client.Net.Mines.IO
             }
 
             return new string(fastReadStringBuffer, 0, length).Replace("\0", "");
+        }
+
+        public void Clear()
+        {
+            Bytes.Clear();
+            ReadPosition = 0;
+            RemoveOnRead = false;
         }
     }
 }

@@ -49,5 +49,11 @@ namespace MMO_Client.Client.Net.Mines
 
         public void SetPayload(int payload) =>
             Payload = payload;
+
+        public void Clear()
+        {
+            Payload = -1;
+            mis.Clear();
+        }
     }
 }

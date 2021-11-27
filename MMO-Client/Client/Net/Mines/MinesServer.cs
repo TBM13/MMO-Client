@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Buffers;
+using System.Buffers.Binary;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using MMO_Client.Client.Net.Mines.IO;
 
@@ -10,39 +10,32 @@ namespace MMO_Client.Client.Net.Mines
     internal class MinesServer
     {
         public static MinesServer Instance { get; private set; }
-        public Events.Mines1Event OnConnect;
-        public Events.Mines1Event OnLogin;
-        public Events.Mines1Event OnLogout;
-        public Events.Mines1Event OnMessage;
+
+        public Events.Mines1Event OnConnect { get; set; }
+        public Events.Mines1Event OnLogin { get; set; }
+        public Events.Mines1Event OnLogout { get; set; }
+        public Events.Mines1Event OnMessage { get; set; }
 
         public string Host { get; private set; }
         public int Port { get; private set; }
-        public bool Connected { get => socket.Connected; }
+        public bool Connected => socket.Connected;
 
         private readonly Socket socket = new(SocketType.Stream, ProtocolType.Tcp);
 
-        private readonly List<byte[]> pendingReadBytes = new();
-        private readonly ByteArray pendingBytes = new();
-        private Message pendingMessage;
-        private bool readingMsg;
-
-        private readonly Thread msgProcessingThread;
-        private readonly List<Message> pendingProcessingMessages = new();
+        private readonly ByteArray pendingBytes = new() { RemoveOnRead = true };
+        private readonly Message pendingMessage = new();
+        private bool readingMsg, workingOnMsg;
 
         public MinesServer()
         {
             if (Instance == null)
                 Instance = this;
-
-            pendingBytes.RemoveOnRead = true;
-            msgProcessingThread = new(ProcessMessage);
-            msgProcessingThread.IsBackground = true;
         }
 
         /// <summary>
         /// Connects the socket to the specified host and starts the read loop if the connection was successful.
         /// </summary>
-        public async void Connect(string host, int port)
+        public async Task ConnectAsync(string host, int port)
         {
             try
             {
@@ -52,13 +45,12 @@ namespace MMO_Client.Client.Net.Mines
                 if (socket.Connected)
                 {
                     Logger.Info("Connected!");
-                    
+
                     Host = host;
                     Port = port;
                     OnConnect?.Invoke(new MinesEvent(true, null, null));
 
-                    msgProcessingThread.Start();
-                    ReadLoop();
+                    _ = ReadLoopAsync();
                     return;
                 }
 
@@ -80,7 +72,7 @@ namespace MMO_Client.Client.Net.Mines
             mos.WriteMobject(mobj);
 
 #if NetworkDebugVerbose
-            Logger.Instance.Debug($"Sending Mobject {mobj.ToString().Replace("\n", ",")}", Name);
+            Logger.Debug($"Sending Mobject {mobj.ToString().Replace("\n", ",")}", Name);
 
             string result = "";
             byte[] b = new byte[mos.Bytes.Count];
@@ -90,34 +82,30 @@ namespace MMO_Client.Client.Net.Mines
                 b[i] = mos.Bytes[i];
             }
 
-            Logger.Instance.Debug($"Bytes: {result}", Name);
+            Logger.Debug($"Bytes: {result}", Name);
 #endif
 
-            byte[] bytesToSend = new byte[mos.Bytes.Count + 5];
+            int length = mos.Bytes.Count + 5;
+
+            byte[] bytesToSend = ArrayPool<byte>.Shared.Rent(length);
             bytesToSend[0] = Message.HEADER_TYPE; // Write header type
 
-            byte[] lengthBytes = BitConverter.GetBytes(mos.Bytes.Count);
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(lengthBytes, 0, lengthBytes.Length);
+            BinaryPrimitives.WriteInt32BigEndian(new Span<byte>(bytesToSend, 1, 4), mos.Bytes.Count); // Write Length
 
-            for (int i = 0; i < lengthBytes.Length; i++) // Write mos length
-                bytesToSend[i + 1] = lengthBytes[i];
-
-            for (int i = 5; i < bytesToSend.Length; i++) // Write mos bytes
+            for (int i = 5; i < length; i++) // Write bytes
                 bytesToSend[i] = mos.Bytes[i - 5];
 
-            Send(bytesToSend);
+            Send(bytesToSend, length);
         }
 
         /// <summary>
         /// Sends the byte array to the server.
         /// </summary>
-        /// <param name="bytesToSend"></param>
-        public void Send(byte[] bytesToSend)
+        private void Send(byte[] bytesToSend, int size)
         {
             try
             {
-                socket.BeginSend(bytesToSend, 0, bytesToSend.Length, 0, new AsyncCallback(SendCallback), null);
+                _ = socket.BeginSend(bytesToSend, 0, size, 0, new AsyncCallback(SendCallback), bytesToSend);
             }
             catch (SocketException e)
             {
@@ -125,22 +113,26 @@ namespace MMO_Client.Client.Net.Mines
             }
         }
 
-        private void SendCallback(IAsyncResult ar) =>
+        private void SendCallback(IAsyncResult ar)
+        {
             socket.EndSend(ar);
+
+            ArrayPool<byte>.Shared.Return((byte[])ar.AsyncState);
+        }
 
         /// <summary>
         /// Continually checks if there is available data for reading, and reads it.
         /// </summary>
-        private async void ReadLoop()
+        private async Task ReadLoopAsync()
         {
             while (true)
             {
                 if (socket.Available > 0)
                 {
                     int available = socket.Available;
-                    byte[] buffer = new byte[available];
+                    byte[] buffer = ArrayPool<byte>.Shared.Rent(available);
 
-                    socket.BeginReceive(buffer, 0, available, 0, new AsyncCallback(ReceiveCallback), buffer);
+                    _ = socket.BeginReceive(buffer, 0, available, 0, new AsyncCallback(ReceiveCallback), buffer);
                 }
 
                 await Task.Delay(50);
@@ -151,34 +143,24 @@ namespace MMO_Client.Client.Net.Mines
         {
             int bytesRead = socket.EndReceive(ar);
 
-            if (bytesRead > 0)
-            {
 #if NetworkDebugVerbose
-                Logger.Instance.Debug($"{bytesRead} bytes read", Name);
+            Logger.Debug($"{bytesRead} bytes read", Name);
 #endif
 
-                byte[] buffer = (byte[])ar.AsyncState;
-                pendingReadBytes.Add(buffer);
+            byte[] buffer = (byte[])ar.AsyncState;
+            pendingBytes.WriteBytes(buffer, 0, bytesRead);
 
-                if (!readingMsg)
-                    HandleSocketData();
-            }
-            else
-                Logger.Fatal("ReceiveCallback: bytesRead is 0 !!!");
+            ArrayPool<byte>.Shared.Return(buffer);
+
+            if (!readingMsg)
+                HandleSocketData();
         }
 
         private void HandleSocketData()
         {
             readingMsg = true;
 
-            for (int i = 0; i < pendingReadBytes.Count; i++)
-            {
-                pendingBytes.WriteBytes(pendingReadBytes[i], 0, pendingReadBytes[i].Length);
-                pendingReadBytes.RemoveAt(i);
-                i--;
-            }
-
-            if (pendingMessage == null)
+            if (!workingOnMsg)
             {
                 int header = pendingBytes.ReadByte();
                 if (header != Message.HEADER_TYPE)
@@ -188,7 +170,8 @@ namespace MMO_Client.Client.Net.Mines
                     return;
                 }
 
-                pendingMessage = new Message();
+                pendingMessage.Clear();
+                workingOnMsg = true;
             }
 
             if (pendingMessage.NeedsPayload)
@@ -209,13 +192,13 @@ namespace MMO_Client.Client.Net.Mines
                 Logger.Debug($"Msg parsed ({pendingMessage.Payload})");
 #endif
 
-                pendingProcessingMessages.Add(pendingMessage);
-                pendingMessage = null;
+                ProcessMessage(pendingMessage);
+                workingOnMsg = false;
 
                 if (pendingBytes.Bytes.Count > 0)
                 {
 #if NetworkDebugVerbose
-                    Logger.Instance.Debug($"Parsing extra {pendingBytes.Bytes.Count} bytes", Name);
+                    Logger.Debug($"Parsing extra {pendingBytes.Bytes.Count} bytes", Name);
 #endif
                     HandleSocketData();
                     return;
@@ -229,43 +212,32 @@ namespace MMO_Client.Client.Net.Mines
             readingMsg = false;
         }
 
-        private void ProcessMessage()
+        private void ProcessMessage(Message msg)
         {
-            while (true)
+            Mobject mObj = msg.ToMobject();
+            switch (mObj.Strings["type"])
             {
-                if (pendingProcessingMessages.Count == 0)
-                {
-                    Thread.Sleep(70);
-                    continue;
-                }
+                case "ping":
+                    break;
+                case "data":
+                    bool success = true;
 
-                Mobject mObj = pendingProcessingMessages[0].ToMobject();
-                switch (mObj.Strings["type"])
-                {
-                    case "ping":
-                        break;
-                    case "data":
-                        bool success = true;
+                    Mobject m = mObj.Mobjects["mobject"];
+                    if (m.Booleans.ContainsKey("success"))
+                        success = m.Booleans["success"];
 
-                        Mobject m = mObj.Mobjects["mobject"];
-                        if (m.Booleans.ContainsKey("success"))
-                            success = m.Booleans["success"];
-
-                        OnMessage?.Invoke(new MinesEvent(success, null, m));
-                        break;
-                    case "login":
-                        OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings.ContainsKey("errorCode") ? mObj.Strings["errorCode"] : "<empty>", mObj.Mobjects["mobject"]));
-                        break;
-                    case "logout":
-                        OnLogout?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings.ContainsKey("errorCode") ? mObj.Strings["errorCode"] : "<empty>", mObj.Mobjects["mobject"]));
-                        Logger.Debug("Logout!!!", true);
-                        break;
-                    default:
-                        Logger.Error($"Unexpected Message Type \"{mObj.Strings["type"]}\"");
-                        break;
-                }
-
-                pendingProcessingMessages.RemoveAt(0);
+                    OnMessage?.Invoke(new MinesEvent(success, null, m));
+                    break;
+                case "login":
+                    OnLogin?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings.ContainsKey("errorCode") ? mObj.Strings["errorCode"] : "<empty>", mObj.Mobjects["mobject"]));
+                    break;
+                case "logout":
+                    OnLogout?.Invoke(new MinesEvent(mObj.Booleans["result"], mObj.Strings.ContainsKey("errorCode") ? mObj.Strings["errorCode"] : "<empty>", mObj.Mobjects["mobject"]));
+                    Logger.Debug("Logout!!!", true);
+                    break;
+                default:
+                    Logger.Error($"Unexpected Message Type \"{mObj.Strings["type"]}\"");
+                    break;
             }
         }
 
@@ -281,7 +253,7 @@ namespace MMO_Client.Client.Net.Mines
         public void LoginWithID(string username, string hash)
         {
             Mobject mobj = new();
-            mobj.Strings["size"] = "4863295";
+            mobj.Strings["size"] = "14417855";
             mobj.Strings["hash"] = hash;
             mobj.Strings["type"] = "login";
             mobj.Strings["check"] = "haha";

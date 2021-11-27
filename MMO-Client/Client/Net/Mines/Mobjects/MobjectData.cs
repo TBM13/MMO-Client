@@ -1,4 +1,6 @@
-﻿namespace MMO_Client.Client.Net.Mines
+﻿using System.Text;
+
+namespace MMO_Client.Client.Net.Mines
 {
     internal class MobjectData
     {
@@ -13,7 +15,7 @@
             DataType = type;
         }
 
-        public override string ToString()=> 
+        public override string ToString() =>
             $"<{Key}:{DataType}={GetValueAsString()}>";
 
         /// <summary>
@@ -28,31 +30,34 @@
                 case MobjectDataType.FLOAT_ARRAY:
                 case MobjectDataType.INTEGER_ARRAY:
                 case MobjectDataType.STRING_ARRAY:
-                    string result = "";
+                    StringBuilder sb = new();
+
                     foreach (object obj in Value)
                     {
                         string value = obj.ToString();
                         if (obj is float)
                             value = value.Replace(',', '.');
                         else if (obj is bool)
-                            value = value.ToLower();
+                            value = value.ToLowerInvariant();
 
-                        result += value + ",";
+                        sb.Append(value);
+                        sb.Append(',');
                     }
 
-                    if (result.EndsWith(","))
-                        result = result.Remove(result.Length - 1, 1);
+                    if (sb[^1] == ',')
+                        sb.Remove(sb.Length - 1, 1);
 
-                    return result;
+                    return sb.ToString();
                 case MobjectDataType.MOBJECT_ARRAY:
-                    string result2 = "";
+                    StringBuilder sb2 = new();
+
                     foreach (Mobject obj in Value)
                     {
                         string value = obj.ToString(depth + 1);
-                        result2 += value;
+                        sb2.Append(value);
                     }
 
-                    return result2;
+                    return sb2.ToString();
                 case MobjectDataType.MOBJECT:
                     string v2 = Value.ToString(depth + 1);
                     return v2;
