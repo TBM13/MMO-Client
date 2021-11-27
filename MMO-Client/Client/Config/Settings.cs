@@ -43,7 +43,7 @@ namespace MMO_Client.Client.Config
             lf.OnError += (_) =>
                 OnSettingsLoaded?.Invoke(false);
 
-            lf.Load(url);
+            _ = lf.LoadAsync(url);
         }
     }
 }

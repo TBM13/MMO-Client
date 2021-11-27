@@ -27,12 +27,14 @@ namespace MMO_Client.Client.Net.Security
 
         public string[] CreateValidationDigest(string key)
         {
-            string time = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
+            StringBuilder validationSB = new(28);
+            validationSB.Append(Prepare(MainWindow.Username));
+            validationSB.Append(DateTimeOffset.Now.ToUnixTimeMilliseconds());
 
-            string validationStr = Prepare(MainWindow.Username) + time;
-            while (validationStr.Length % 16 != 0)
-                validationStr += "0";
+            while (validationSB.Length % 16 != 0)
+                validationSB.Append('0');
 
+            string validationStr = validationSB.ToString();
             string hash = EncryptRijndael(validationStr, key);
             string num = validationStr[MainWindow.Username.Length..];
 
@@ -83,7 +85,7 @@ namespace MMO_Client.Client.Net.Security
 
         private string CharsToHex(byte[] bytes)
         {
-            StringBuilder sb = new(bytes.Length);
+            StringBuilder sb = new(bytes.Length * 2);
             for (int i = 0; i < bytes.Length; i++)
             {
                 sb.Append(hexChars[bytes[i] >> 4]);
@@ -93,7 +95,7 @@ namespace MMO_Client.Client.Net.Security
             return sb.ToString();
         }
 
-        public void Dispose() => 
+        public void Dispose() =>
             rijndael.Dispose();
     }
 }

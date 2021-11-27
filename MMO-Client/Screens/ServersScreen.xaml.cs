@@ -40,7 +40,7 @@ namespace MMO_Client.Screens
             lf.OnError += (_) =>
                 LoadScreen.ShowError("Error while loading servers", true);
 
-            lf.Load(Settings.Instance.Dictionary["connection"]["directory"] + "&" + Utils.GetUnixTime().ToString());
+            _ = lf.LoadAsync(Settings.Instance.Dictionary["connection"]["directory"] + "&" + Utils.GetUnixTime().ToString());
         }
 
         private void OnServersFileLoaded(string data)

@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MMO_Client.Client.Net
 {
@@ -9,7 +10,7 @@ namespace MMO_Client.Client.Net
 
         private readonly HttpClient client = new();
 
-        public async void Load(string url)
+        public async Task LoadAsync(string url)
         {
             string data;
             try
