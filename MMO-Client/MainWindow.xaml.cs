@@ -140,7 +140,7 @@ namespace MMO_Client
             LoadScreen.OnRetryClick += retry;
 
             MinesServer.Instance.OnConnect += OnMinesConnect;
-            MinesServer.Instance.Connect(host, int.Parse(port) + 1);
+           _ = MinesServer.Instance.ConnectAsync(host, int.Parse(port) + 1);
         }
 
         private void OnMinesConnect(MinesEvent mEvent)
