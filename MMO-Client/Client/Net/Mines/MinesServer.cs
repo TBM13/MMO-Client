@@ -253,10 +253,10 @@ namespace MMO_Client.Client.Net.Mines
         public void LoginWithID(string username, string hash)
         {
             Mobject mobj = new();
-            mobj.Strings["size"] = "14417855";
+            mobj.Strings["size"] = "4952113";
             mobj.Strings["hash"] = hash;
             mobj.Strings["type"] = "login";
-            mobj.Strings["check"] = "haha";
+            mobj.Strings["check"] = "49KQ4FQ2FY";
             mobj.Strings["username"] = username;
 
             Send(mobj);
